@@ -59,7 +59,7 @@ export default function Topbar({ onMenuToggle, title }: TopbarProps) {
               className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-200
                 hover:bg-gray-50 text-sm text-gray-700 transition-colors"
             >
-              <Building2 className="h-4 w-4 text-gray-400" />
+              {/* <Building2 className="h-4 w-4 text-gray-400" /> */}
               <span className="hidden md:block font-medium max-w-[160px] truncate">
                 {selectedChurch?.name ?? 'All Churches'}
               </span>
@@ -98,10 +98,10 @@ export default function Topbar({ onMenuToggle, title }: TopbarProps) {
         {/* Church badge — non-super_admin */}
         {!isSuperAdmin && currentUser?.church && (
           <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 bg-indigo-50 border border-indigo-100 rounded-lg">
-            <Building2 className="h-3.5 w-3.5 text-indigo-500" />
-            <span className="text-xs font-medium text-indigo-700 max-w-[140px] truncate">
-              {currentUser.church.name}
-            </span>
+            {/* <Building2 className="h-3.5 w-3.5 text-indigo-500" /> */}
+            <span className="text-xs font-medium text-indigo-700 max-w-[140px] truncate sm:max-w-none sm:truncate-none">
+  {currentUser.church.name}
+</span>
           </div>
         )}
 

@@ -115,7 +115,6 @@ export interface ApiSermon {
   preacher: string;
   church: string;
   date: string;
-  series: string;
   scriptureReferences: string[];
   summary: string;
   audioUrl: string;
@@ -132,7 +131,6 @@ export interface ApiSermonSummary {
   preacher: string;
   church: string;
   date: string;
-  series: string;
   scriptureReferences: string[];
   summary: string;
   audioUrl: string;
@@ -154,7 +152,6 @@ export interface SermonFilters {
   preacher?: string;
   church?: string;
   year?: string;
-  series?: string;
   page?: number;
   limit?: number;
 }
@@ -162,42 +159,17 @@ export interface SermonFilters {
 export interface SermonMetaData {
   preachers: string[];
   churches: string[];
-  series: string[];
 }
 
 export interface CreateSermonInput {
   title: string;
   preacher: string;
   date: string;
-  series?: string;
   scriptureReferences?: string[];
   summary?: string;
   audioUrl?: string;
   video?: SermonVideo | null;
   content?: SermonContent;
-  church?: string;
-}
-
-// ─── Series ─────────────────────────────────────────────────────────────────
-
-export interface ApiSeries {
-  _id: string;
-  name: string;
-  description: string;
-  church: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface SeriesListResponse {
-  success: boolean;
-  total: number;
-  data: ApiSeries[];
-}
-
-export interface CreateSeriesInput {
-  name: string;
-  description?: string;
   church?: string;
 }
 
@@ -215,6 +187,85 @@ export interface UploadAttachmentResponse {
   filename: string;
   originalName: string;
   fileType: string;
+}
+
+// ─── AI Sermon Pipeline ──────────────────────────────────────────────────────
+
+export type SermonJobStatus = 'uploaded' | 'processing' | 'completed' | 'failed';
+export type PipelineStageStatus = 'pending' | 'processing' | 'done' | 'failed';
+export type AISectionType = 'introduction' | 'point' | 'conclusion';
+
+export interface PipelineStage {
+  status: PipelineStageStatus;
+  error: string;
+}
+
+export interface AISection {
+  type: AISectionType;
+  title: string;
+  content: string;
+  scripture: string[];
+}
+
+export interface AIResult {
+  titleSuggestions: string[];
+  summary: string;
+  sections: AISection[];
+  keyThemes: string[];
+  keyVerses: string[];
+}
+
+export interface SermonJob {
+  _id: string;
+  sourceFileUrl: string;
+  sourceFileType: 'audio' | 'document';
+  originalFileName: string;
+  userPrompt: string;
+  church: string;
+  status: SermonJobStatus;
+  stages: {
+    transcribing: PipelineStage;
+    analyzing: PipelineStage;
+    structuring: PipelineStage;
+    saving: PipelineStage;
+  };
+  rawTranscript: string;
+  errorMessage: string;
+  aiResult: AIResult;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AIUploadResponse {
+  success: boolean;
+  jobId: string;
+  fileUrl: string;
+  fileType: 'audio' | 'document';
+  originalFileName: string;
+  filename: string;
+}
+
+export interface AIProcessResponse {
+  success: boolean;
+  message: string;
+  jobId: string;
+}
+
+export interface AIStatusResponse {
+  success: boolean;
+  data: SermonJob;
+}
+
+export interface CreateSermonFromAIInput {
+  jobId: string;
+  title: string;
+  preacher: string;
+  date: string;
+  scriptureReferences?: string[];
+  summary?: string;
+  church?: string;
+  audioUrl?: string;
+  video?: SermonVideo | null;
 }
 
 // ─── Toast ───────────────────────────────────────────────────────────────────

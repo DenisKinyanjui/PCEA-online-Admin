@@ -110,46 +110,70 @@ export default function AdminUsers() {
         }
       />
 
-      {/* Create form */}
+      {/* Create user modal */}
       {showCreate && (
-        <div className="admin-card p-5 space-y-4 border-indigo-200 ring-1 ring-indigo-100">
-          <h3 className="text-sm font-semibold text-gray-900">Create New User</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="admin-label">Name <span className="text-red-500">*</span></label>
-              <input value={createForm.name} onChange={(e) => setC('name', e.target.value)} className="admin-input" placeholder="Full name" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setShowCreate(false); setCreateForm(emptyCreate); }} />
+          <div className="relative admin-card w-full max-w-lg p-6 shadow-xl">
+            <button
+              onClick={() => { setShowCreate(false); setCreateForm(emptyCreate); }}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-5">
+              <div className="w-9 h-9 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-center flex-shrink-0">
+                <Users className="h-4 w-4 text-indigo-600" />
+              </div>
+              <div>
+                <h3 className="text-base font-semibold text-gray-900">Create New User</h3>
+                <p className="text-xs text-gray-500">Fill in the details to add a user to the system.</p>
+              </div>
             </div>
-            <div>
-              <label className="admin-label">Email <span className="text-red-500">*</span></label>
-              <input type="email" value={createForm.email} onChange={(e) => setC('email', e.target.value)} className="admin-input" placeholder="user@church.org" />
-            </div>
-            <div>
-              <label className="admin-label">Password <span className="text-red-500">*</span></label>
-              <input type="password" value={createForm.password} onChange={(e) => setC('password', e.target.value)} className="admin-input" placeholder="Min 8 characters" />
-            </div>
-            <div>
-              <label className="admin-label">Role <span className="text-red-500">*</span></label>
-              <select value={createForm.role} onChange={(e) => setC('role', e.target.value)} className="admin-select">
-                <option value="church_admin">Church Admin</option>
-                <option value="transcriptionist">Transcriptionist</option>
-                <option value="super_admin">Super Admin</option>
-              </select>
-            </div>
-            {createForm.role !== 'super_admin' && (
-              <div className="sm:col-span-2">
-                <label className="admin-label">Church <span className="text-red-500">*</span></label>
-                <select value={createForm.church} onChange={(e) => setC('church', e.target.value)} className="admin-select">
-                  <option value="">— Select a church —</option>
-                  {churches.map((c) => <option key={c._id} value={c._id}>{c.name}</option>)}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="admin-label">Name <span className="text-red-500">*</span></label>
+                <input value={createForm.name} onChange={(e) => setC('name', e.target.value)} className="admin-input" placeholder="Full name" />
+              </div>
+              <div>
+                <label className="admin-label">Email <span className="text-red-500">*</span></label>
+                <input type="email" value={createForm.email} onChange={(e) => setC('email', e.target.value)} className="admin-input" placeholder="user@church.org" />
+              </div>
+              <div>
+                <label className="admin-label">Password <span className="text-red-500">*</span></label>
+                <input type="password" value={createForm.password} onChange={(e) => setC('password', e.target.value)} className="admin-input" placeholder="Min 8 characters" />
+              </div>
+              <div>
+                <label className="admin-label">Role <span className="text-red-500">*</span></label>
+                <select value={createForm.role} onChange={(e) => setC('role', e.target.value)} className="admin-select">
+                  <option value="church_admin">Church Admin</option>
+                  <option value="transcriptionist">Transcriptionist</option>
+                  <option value="super_admin">Super Admin</option>
                 </select>
               </div>
-            )}
-          </div>
-          <div className="flex gap-2 justify-end">
-            <button onClick={() => { setShowCreate(false); setCreateForm(emptyCreate); }} className="btn-secondary">Cancel</button>
-            <button onClick={handleCreate} disabled={createMutation.isPending} className="btn-primary">
-              {createMutation.isPending ? 'Creating…' : 'Create User'}
-            </button>
+              {createForm.role !== 'super_admin' && (
+                <div className="sm:col-span-2">
+                  <label className="admin-label">Church <span className="text-red-500">*</span></label>
+                  <select value={createForm.church} onChange={(e) => setC('church', e.target.value)} className="admin-select">
+                    <option value="">— Select a church —</option>
+                    {churches.map((c) => <option key={c._id} value={c._id}>{c.name}</option>)}
+                  </select>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 mt-6 justify-end">
+              <button onClick={() => { setShowCreate(false); setCreateForm(emptyCreate); }} className="btn-secondary">Cancel</button>
+              <button onClick={handleCreate} disabled={createMutation.isPending} className="btn-primary">
+                {createMutation.isPending ? (
+                  <><span className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin" /> Creating…</>
+                ) : (
+                  <><Plus className="h-3.5 w-3.5" /> Create User</>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -13,7 +13,6 @@ export async function fetchSermons(filters: SermonFilters = {}): Promise<Sermons
   if (filters.preacher) params.preacher = filters.preacher;
   if (filters.church) params.church = filters.church;
   if (filters.year) params.year = filters.year;
-  if (filters.series) params.series = filters.series;
   if (filters.page) params.page = filters.page;
   if (filters.limit) params.limit = filters.limit;
   const { data } = await axiosInstance.get<SermonsResponse>('/sermons', { params });

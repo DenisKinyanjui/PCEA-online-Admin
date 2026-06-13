@@ -58,7 +58,6 @@ export default function AdminSermons() {
       render: (s) => (
         <div>
           <p className="font-medium text-gray-900 line-clamp-1">{s.title}</p>
-          {s.series && <p className="text-xs text-gray-400 mt-0.5">{s.series}</p>}
         </div>
       ),
     },

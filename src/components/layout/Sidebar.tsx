@@ -1,9 +1,10 @@
 import { NavLink, useResolvedPath, useMatch } from 'react-router-dom';
 import {
-  LayoutDashboard, BookOpen, BookMarked, Upload, User, ChevronRight, X, Building2, Users,
+  LayoutDashboard, BookOpen, Upload, User, ChevronRight, X, Building2, Users,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { ROUTE_PERMISSIONS } from '../../config/roles';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,9 +22,8 @@ interface NavItemDef {
 const nav: NavItemDef[] = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/admin/sermons', label: 'Sermons', icon: BookOpen, end: false },
-  { to: '/admin/series', label: 'Series', icon: BookMarked, end: false },
-  { to: '/admin/churches', label: 'Churches', icon: Building2, end: false, roles: ['super_admin', 'church_admin'] },
-  { to: '/admin/users', label: 'Users', icon: Users, end: false, roles: ['super_admin', 'church_admin'] },
+  { to: '/admin/churches', label: 'Churches', icon: Building2, end: false, roles: ROUTE_PERMISSIONS.churches },
+  { to: '/admin/users', label: 'Users', icon: Users, end: false, roles: ROUTE_PERMISSIONS.users },
   { to: '/admin/uploads', label: 'Uploads', icon: Upload, end: false },
   { to: '/admin/profile', label: 'Profile', icon: User, end: false },
 ];
@@ -71,8 +71,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 h-16 border-b border-gray-200 flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
-              <BookOpen className="h-4 w-4 text-white" />
+            <div className="w-10 h-10 border border-gray-300 rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm">
+              <img src="/images/PCEALogo.png" alt="PCEA Logo" className="w-8 h-8" />
             </div>
             <div>
               <p className="text-sm font-semibold text-gray-900 leading-none">PCEA Admin</p>
@@ -86,9 +86,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto py-4 px-3">
-          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest px-3 mb-3">
-            Navigation
-          </p>
+          
           <ul className="space-y-0.5">
             {visibleNav.map((item) => (
               <li key={item.to}>

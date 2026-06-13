@@ -3,14 +3,16 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './context/ToastContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import RoleGuard from './components/RoleGuard';
 import AdminLayout from './components/layout/AdminLayout';
+import { ROUTE_PERMISSIONS } from './config/roles';
 
 import AdminLogin from './pages/AdminLogin';
+import Admin403 from './pages/Admin403';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminSermons from './pages/AdminSermons';
 import AdminSermonNew from './pages/AdminSermonNew';
 import AdminSermonEdit from './pages/AdminSermonEdit';
-import AdminSeries from './pages/AdminSeries';
 import AdminChurches from './pages/AdminChurches';
 import AdminChurchForm from './pages/AdminChurchForm';
 import AdminUsers from './pages/AdminUsers';
@@ -39,17 +41,57 @@ export default function App() {
                   </ProtectedRoute>
                 }
               >
+                {/* Accessible to all authenticated roles */}
                 <Route index element={<AdminDashboard />} />
-                <Route path="sermons" element={<AdminSermons />} />
-                <Route path="sermons/new" element={<AdminSermonNew />} />
-                <Route path="sermons/:id/edit" element={<AdminSermonEdit />} />
-                <Route path="series" element={<AdminSeries />} />
-                <Route path="churches" element={<AdminChurches />} />
-                <Route path="churches/new" element={<AdminChurchForm />} />
-                <Route path="churches/:id/edit" element={<AdminChurchForm />} />
-                <Route path="users" element={<AdminUsers />} />
-                <Route path="uploads" element={<AdminUploads />} />
-                <Route path="profile" element={<AdminProfile />} />
+                <Route path="403" element={<Admin403 />} />
+
+                <Route path="sermons" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.sermons}>
+                    <AdminSermons />
+                  </RoleGuard>
+                } />
+                <Route path="sermons/new" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.sermons}>
+                    <AdminSermonNew />
+                  </RoleGuard>
+                } />
+                <Route path="sermons/:id/edit" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.sermons}>
+                    <AdminSermonEdit />
+                  </RoleGuard>
+                } />
+                <Route path="uploads" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.uploads}>
+                    <AdminUploads />
+                  </RoleGuard>
+                } />
+                <Route path="profile" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.profile}>
+                    <AdminProfile />
+                  </RoleGuard>
+                } />
+
+                {/* Super admin only */}
+                <Route path="churches" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.churches}>
+                    <AdminChurches />
+                  </RoleGuard>
+                } />
+                <Route path="churches/new" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.churches}>
+                    <AdminChurchForm />
+                  </RoleGuard>
+                } />
+                <Route path="churches/:id/edit" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.churches}>
+                    <AdminChurchForm />
+                  </RoleGuard>
+                } />
+                <Route path="users" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.users}>
+                    <AdminUsers />
+                  </RoleGuard>
+                } />
               </Route>
 
               <Route path="*" element={<Navigate to="/admin" replace />} />

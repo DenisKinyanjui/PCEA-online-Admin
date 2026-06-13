@@ -3,7 +3,6 @@ import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import TagInput from './TagInput';
 import UploadField from './UploadField';
 import { useChurch } from '../../context/ChurchContext';
-import { useSeries } from '../../hooks/useSeries';
 import type { ApiSermon, CreateSermonInput, ApiChurch } from '../../types';
 
 interface PointState {
@@ -17,7 +16,6 @@ interface FormState {
   preacher: string;
   date: string;
   church: string;
-  series: string;
   scriptureReferences: string[];
   summary: string;
   audioUrl: string;
@@ -43,7 +41,7 @@ function emptyPoint(): PointState {
 function toFormState(sermon: ApiSermon | undefined, defaultChurch: string): FormState {
   if (!sermon) {
     return {
-      title: '', preacher: '', date: '', church: defaultChurch, series: '',
+      title: '', preacher: '', date: '', church: defaultChurch,
       scriptureReferences: [], summary: '', audioUrl: '', videoType: '', videoUrl: '',
       introduction: '', points: [emptyPoint()], conclusion: '',
     };
@@ -53,7 +51,6 @@ function toFormState(sermon: ApiSermon | undefined, defaultChurch: string): Form
     preacher: sermon.preacher,
     date: sermon.date.slice(0, 10),
     church: sermon.church ?? defaultChurch,
-    series: sermon.series ?? '',
     scriptureReferences: sermon.scriptureReferences ?? [],
     summary: sermon.summary ?? '',
     audioUrl: sermon.audioUrl ?? '',
@@ -75,13 +72,8 @@ export default function SermonForm({ initialData, churches, onSubmit, isSubmitti
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [openSection, setOpenSection] = useState<'media' | 'content' | null>('content');
 
-  // Fetch series filtered by selected church
-  const { data: seriesData } = useSeries(form.church || undefined);
-  const seriesList = seriesData?.data ?? [];
-
   const set = (field: keyof FormState, value: unknown) => {
     setForm((prev) => ({ ...prev, [field]: value }));
-    if (field === 'church') setForm((prev) => ({ ...prev, church: value as string, series: '' }));
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
@@ -108,7 +100,6 @@ export default function SermonForm({ initialData, churches, onSubmit, isSubmitti
       preacher: form.preacher.trim(),
       date: form.date,
       church: form.church || undefined,
-      series: form.series || undefined,
       scriptureReferences: form.scriptureReferences,
       summary: form.summary.trim() || undefined,
       audioUrl: form.audioUrl.trim() || undefined,
@@ -204,28 +195,6 @@ export default function SermonForm({ initialData, churches, onSubmit, isSubmitti
               {form.church || 'No church assigned'}
             </div>
           )}
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="admin-label">Series</label>
-            <div className="relative">
-              <select
-                value={form.series}
-                onChange={(e) => set('series', e.target.value)}
-                className="admin-select pr-8"
-              >
-                <option value="">— No series —</option>
-                {seriesList.map((s) => (
-                  <option key={s._id} value={s.name}>{s.name}</option>
-                ))}
-              </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
-            </div>
-            {!form.church && isSuperAdmin && (
-              <p className="text-xs text-gray-400 mt-1">Select a church first to see its series</p>
-            )}
-          </div>
         </div>
 
         <div>

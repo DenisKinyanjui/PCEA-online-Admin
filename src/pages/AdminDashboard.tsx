@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, BookMarked, Plus, ArrowRight, Calendar, Building2 } from 'lucide-react';
+import { BookOpen, Plus, ArrowRight, Calendar, Building2 } from 'lucide-react';
 import StatsCard from '../components/ui/StatsCard';
 import DataTable, { type Column } from '../components/ui/DataTable';
 import { useSermons } from '../hooks/useSermons';
-import { useSeries } from '../hooks/useSeries';
 import { useChurches } from '../hooks/useChurches';
 import { useChurch } from '../context/ChurchContext';
 import type { ApiSermonSummary } from '../types';
@@ -16,12 +15,10 @@ export default function AdminDashboard() {
     page: 1,
     limit: 5,
   });
-  const { data: seriesData, isLoading: seriesLoading } = useSeries(churchFilter);
   const { data: churchesData, isLoading: churchesLoading } = useChurches();
 
   const latestSermons = sermonData?.data ?? [];
   const totalSermons = sermonData?.total ?? 0;
-  const totalSeries = seriesData?.total ?? 0;
   const totalChurches = churchesData?.total ?? 0;
 
   const thisYear = new Date().getFullYear().toString();
@@ -72,9 +69,8 @@ export default function AdminDashboard() {
       </div>
 
       {/* Stats */}
-      <div className={`grid gap-4 ${isSuperAdmin ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-2 lg:grid-cols-3'}`}>
+      <div className={`grid gap-4 ${isSuperAdmin ? 'grid-cols-2 lg:grid-cols-3' : 'grid-cols-2'}`}>
         <StatsCard label="Total Sermons" value={totalSermons} icon={BookOpen} color="indigo" isLoading={sermonsLoading} />
-        <StatsCard label="Series" value={totalSeries} icon={BookMarked} color="emerald" isLoading={seriesLoading} />
         {isSuperAdmin && (
           <StatsCard label="Churches" value={totalChurches} icon={Building2} color="sky" isLoading={churchesLoading} />
         )}
