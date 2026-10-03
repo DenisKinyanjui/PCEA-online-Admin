@@ -35,11 +35,11 @@ export default function TagInput({ tags, onChange, placeholder = 'Add tag, press
       {tags.map((tag) => (
         <span
           key={tag}
-          className="inline-flex items-center gap-1 bg-indigo-50 border border-indigo-200
-            text-indigo-700 text-xs font-medium px-2 py-0.5 rounded-full"
+          className="inline-flex items-center gap-1 bg-indigo-500/10 border border-indigo-500/25
+            text-indigo-300 text-xs font-medium px-2 py-0.5 rounded-full"
         >
           {tag}
-          <button type="button" onClick={() => removeTag(tag)} className="hover:text-indigo-900">
+          <button type="button" onClick={() => removeTag(tag)} className="hover:text-indigo-200">
             <X className="h-2.5 w-2.5" />
           </button>
         </span>
@@ -51,8 +51,8 @@ export default function TagInput({ tags, onChange, placeholder = 'Add tag, press
         onKeyDown={handleKeyDown}
         onBlur={() => { if (input.trim()) addTag(input); }}
         placeholder={tags.length === 0 ? placeholder : ''}
-        className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-gray-900
-          placeholder:text-gray-400"
+        className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-gray-100
+          placeholder:text-gray-500"
       />
     </div>
   );

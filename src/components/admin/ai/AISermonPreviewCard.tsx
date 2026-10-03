@@ -21,17 +21,17 @@ export default function AISermonPreviewCard({
       {/* Summary */}
       {aiResult.summary && (
         <div className="admin-card p-4">
-          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">
             AI Summary
           </h4>
-          <p className="text-sm text-gray-700 leading-relaxed">{aiResult.summary}</p>
+          <p className="text-sm text-gray-300 leading-relaxed">{aiResult.summary}</p>
         </div>
       )}
 
       {/* Title Suggestions */}
       {aiResult.titleSuggestions.length > 0 && (
         <div className="admin-card p-4">
-          <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+          <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
             Suggested Titles
           </h4>
           <div className="space-y-2">
@@ -41,8 +41,8 @@ export default function AISermonPreviewCard({
                 onClick={() => onSelectTitle(t)}
                 className={`w-full text-left px-3 py-2.5 rounded-lg text-sm border transition-all ${
                   selectedTitle === t
-                    ? 'bg-indigo-50 border-indigo-300 text-indigo-800 font-medium'
-                    : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100 hover:border-gray-300'
+                    ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-200 font-medium'
+                    : 'bg-gray-800/40 border-gray-800 text-gray-300 hover:bg-gray-800 hover:border-gray-700'
                 }`}
               >
                 {selectedTitle === t && (
@@ -61,13 +61,13 @@ export default function AISermonPreviewCard({
           <div className="admin-card p-4">
             <div className="flex items-center gap-2 mb-3">
               <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Key Themes</h4>
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Key Themes</h4>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {aiResult.keyThemes.map((t) => (
                 <span
                   key={t}
-                  className="px-2 py-0.5 bg-amber-50 border border-amber-200 text-amber-700 rounded-full text-xs"
+                  className="px-2 py-0.5 bg-amber-500/10 border border-amber-500/25 text-amber-300 rounded-full text-xs"
                 >
                   {t}
                 </span>
@@ -80,13 +80,13 @@ export default function AISermonPreviewCard({
           <div className="admin-card p-4">
             <div className="flex items-center gap-2 mb-3">
               <BookOpen className="h-3.5 w-3.5 text-indigo-500" />
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Key Verses</h4>
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Key Verses</h4>
             </div>
             <div className="flex flex-wrap gap-1.5">
               {aiResult.keyVerses.map((v) => (
                 <span
                   key={v}
-                  className="px-2 py-0.5 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-full text-xs font-medium"
+                  className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 rounded-full text-xs font-medium"
                 >
                   {v}
                 </span>
@@ -99,51 +99,51 @@ export default function AISermonPreviewCard({
       {/* Sections */}
       {aiResult.sections.length > 0 && (
         <div className="admin-card overflow-hidden">
-          <div className="px-4 py-3 border-b border-gray-100 bg-gray-50">
+          <div className="px-4 py-3 border-b border-gray-800 bg-gray-800/40">
             <div className="flex items-center gap-2">
-              <Tag className="h-3.5 w-3.5 text-gray-400" />
-              <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+              <Tag className="h-3.5 w-3.5 text-gray-500" />
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
                 Sermon Sections ({aiResult.sections.length})
               </h4>
             </div>
           </div>
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-800">
             {aiResult.sections.map((section, idx) => (
               <div key={idx}>
                 <button
                   onClick={() => setExpandedSection(expandedSection === idx ? null : idx)}
-                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 text-left transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-800/40 text-left transition-colors"
                 >
                   <span
                     className={`flex-shrink-0 px-2 py-0.5 rounded text-xs font-medium capitalize ${
                       section.type === 'introduction'
-                        ? 'bg-blue-50 text-blue-700'
+                        ? 'bg-blue-500/10 text-blue-300'
                         : section.type === 'conclusion'
-                        ? 'bg-purple-50 text-purple-700'
-                        : 'bg-emerald-50 text-emerald-700'
+                        ? 'bg-purple-500/10 text-purple-300'
+                        : 'bg-emerald-500/10 text-emerald-300'
                     }`}
                   >
                     {section.type}
                   </span>
-                  <span className="flex-1 text-sm font-medium text-gray-800 truncate">
+                  <span className="flex-1 text-sm font-medium text-gray-200 truncate">
                     {section.title || `Section ${idx + 1}`}
                   </span>
                   {expandedSection === idx ? (
-                    <ChevronUp className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                    <ChevronUp className="h-4 w-4 text-gray-500 flex-shrink-0" />
                   ) : (
-                    <ChevronDown className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                    <ChevronDown className="h-4 w-4 text-gray-500 flex-shrink-0" />
                   )}
                 </button>
 
                 {expandedSection === idx && (
                   <div className="px-4 pb-4 space-y-3">
-                    <p className="text-sm text-gray-700 leading-relaxed">{section.content}</p>
+                    <p className="text-sm text-gray-300 leading-relaxed">{section.content}</p>
                     {section.scripture.length > 0 && (
                       <div className="flex flex-wrap gap-1.5">
                         {section.scripture.map((ref) => (
                           <span
                             key={ref}
-                            className="px-2 py-0.5 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-full text-xs"
+                            className="px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/25 text-indigo-300 rounded-full text-xs"
                           >
                             {ref}
                           </span>

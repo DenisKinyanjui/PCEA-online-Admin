@@ -18,17 +18,17 @@ export default function ConfirmDeleteModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onCancel} />
       <div className="relative admin-card w-full max-w-md p-6 shadow-xl">
-        <button onClick={onCancel} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+        <button onClick={onCancel} className="absolute top-4 right-4 text-gray-500 hover:text-gray-400">
           <X className="h-4 w-4" />
         </button>
 
         <div className="flex items-start gap-4">
-          <div className="w-10 h-10 bg-red-50 border border-red-200 rounded-xl flex items-center justify-center flex-shrink-0">
-            <AlertTriangle className="h-5 w-5 text-red-500" />
+          <div className="w-10 h-10 bg-red-500/10 border border-red-500/25 rounded-xl flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="h-5 w-5 text-red-400" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-gray-900 mb-1">{title}</h3>
-            <p className="text-sm text-gray-500">{message}</p>
+            <h3 className="text-base font-semibold text-gray-100 mb-1">{title}</h3>
+            <p className="text-sm text-gray-400">{message}</p>
           </div>
         </div>
 

@@ -32,8 +32,19 @@ const empty: ChurchFormState = {
   contactEmail: '', contactPhone: '', logoUrl: '', isActive: true,
 };
 
-export default function AdminChurchForm() {
-  const { id } = useParams<{ id: string }>();
+interface AdminChurchFormProps {
+  /**
+   * Single-church profile mode: edit this church in place. Name, slug and active
+   * status are locked — the public site loads the church by slug and sermons
+   * reference it by name, so changing them would break both.
+   */
+  churchId?: string;
+}
+
+export default function AdminChurchForm({ churchId }: AdminChurchFormProps = {}) {
+  const params = useParams<{ id: string }>();
+  const isProfile = Boolean(churchId);
+  const id = churchId ?? params.id;
   const isEdit = Boolean(id);
   const navigate = useNavigate();
   const toast = useToast();
@@ -103,6 +114,13 @@ export default function AdminChurchForm() {
     };
 
     try {
+      if (isProfile) {
+        // Locked fields are never sent, so they can't be changed from here.
+        const { tagline, description, address, contactEmail, contactPhone, logoUrl } = payload;
+        await updateMutation.mutateAsync({ tagline, description, address, contactEmail, contactPhone, logoUrl });
+        toast('Church profile updated!', 'success');
+        return;
+      }
       if (isEdit) {
         await updateMutation.mutateAsync(payload);
         toast('Church updated successfully!', 'success');
@@ -110,6 +128,7 @@ export default function AdminChurchForm() {
         await createMutation.mutateAsync(payload);
         toast('Church created successfully!', 'success');
       }
+      // MULTI-CHURCH: back to the church list.
       navigate('/admin/churches');
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -120,9 +139,9 @@ export default function AdminChurchForm() {
   if (isEdit && isLoading) {
     return (
       <div className="max-w-2xl animate-pulse space-y-4">
-        <div className="h-8 bg-gray-200 rounded w-40" />
+        <div className="h-8 bg-gray-800 rounded w-40" />
         <div className="admin-card p-5 space-y-4">
-          {[...Array(5)].map((_, i) => <div key={i} className="h-10 bg-gray-200 rounded" />)}
+          {[...Array(5)].map((_, i) => <div key={i} className="h-10 bg-gray-800 rounded" />)}
         </div>
       </div>
     );
@@ -133,35 +152,50 @@ export default function AdminChurchForm() {
   return (
     <div className="max-w-2xl">
       <div className="flex items-center gap-3 mb-6">
-        <Link to="/admin/churches" className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
-          <ArrowLeft className="h-4 w-4" />
-        </Link>
+        {/* MULTI-CHURCH: back link to the church list */}
+        {!isProfile && (
+          <Link to="/admin/churches" className="p-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors">
+            <ArrowLeft className="h-4 w-4" />
+          </Link>
+        )}
         <div>
-          <h1 className="text-xl font-bold text-gray-900">{isEdit ? 'Edit Church' : 'New Church'}</h1>
-          <p className="text-sm text-gray-500 mt-0.5">{isEdit ? 'Update church information' : 'Register a new church in the system'}</p>
+          <h1 className="text-xl font-bold text-gray-100">
+            {isProfile ? 'Church Profile' : isEdit ? 'Edit Church' : 'New Church'}
+          </h1>
+          <p className="text-sm text-gray-400 mt-0.5">
+            {isProfile
+              ? 'The details shown on the public website — tagline, description, contact info and logo'
+              : isEdit ? 'Update church information' : 'Register a new church in the system'}
+          </p>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Core info */}
         <div className="admin-card p-5 space-y-4">
-          <h2 className="text-sm font-semibold text-gray-900">Church Details</h2>
+          <h2 className="text-sm font-semibold text-gray-100">Church Details</h2>
 
           <div>
-            <label className="admin-label">Church Name <span className="text-red-500">*</span></label>
+            <label className="admin-label">Church Name <span className="text-red-400">*</span></label>
             <input
               value={form.name}
               onChange={(e) => handleNameChange(e.target.value)}
               placeholder="e.g. P.C.E.A Emmanuel Thome Church"
-              className={`admin-input ${errors.name ? 'border-red-400' : ''}`}
+              readOnly={isProfile}
+              className={`admin-input ${isProfile ? 'bg-gray-800/40 text-gray-400 cursor-not-allowed' : ''} ${errors.name ? 'border-red-400' : ''}`}
             />
-            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name}</p>}
+            {errors.name && <p className="text-xs text-red-400 mt-1">{errors.name}</p>}
+            {isProfile && (
+              <p className="text-xs text-gray-500 mt-1">Locked: sermons are linked to the church by this name.</p>
+            )}
           </div>
 
+          {/* MULTI-CHURCH: slug drives the church's subdomain; hidden in single-church mode. */}
+          {!isProfile && (
           <div>
             <label className="admin-label">
-              Slug <span className="text-red-500">*</span>
-              <span className="font-normal text-gray-400 ml-2">(used for future subdomain support)</span>
+              Slug <span className="text-red-400">*</span>
+              <span className="font-normal text-gray-500 ml-2">(used for future subdomain support)</span>
             </label>
             <input
               value={form.slug}
@@ -170,16 +204,17 @@ export default function AdminChurchForm() {
               className={`admin-input font-mono text-sm ${errors.slug ? 'border-red-400' : ''}`}
             />
             {errors.slug ? (
-              <p className="text-xs text-red-500 mt-1">{errors.slug}</p>
+              <p className="text-xs text-red-400 mt-1">{errors.slug}</p>
             ) : (
-              <p className="text-xs text-gray-400 mt-1">Future URL: <span className="font-mono">{form.slug || 'your-slug'}.pcea.ke</span></p>
+              <p className="text-xs text-gray-500 mt-1">Future URL: <span className="font-mono">{form.slug || 'your-slug'}.pcea.ke</span></p>
             )}
           </div>
+          )}
 
           <div>
             <label className="admin-label">
               Hero Tagline
-              <span className="font-normal text-gray-400 ml-2">(shown as the main headline on the church's subdomain)</span>
+              <span className="font-normal text-gray-500 ml-2">(shown as the main headline on the website's home page)</span>
             </label>
             <input
               value={form.tagline}
@@ -213,7 +248,7 @@ export default function AdminChurchForm() {
 
         {/* Contact info */}
         <div className="admin-card p-5 space-y-4">
-          <h2 className="text-sm font-semibold text-gray-900">Contact Information</h2>
+          <h2 className="text-sm font-semibold text-gray-100">Contact Information</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="admin-label">Contact Email</label>
@@ -224,7 +259,7 @@ export default function AdminChurchForm() {
                 placeholder="info@church.org"
                 className={`admin-input ${errors.contactEmail ? 'border-red-400' : ''}`}
               />
-              {errors.contactEmail && <p className="text-xs text-red-500 mt-1">{errors.contactEmail}</p>}
+              {errors.contactEmail && <p className="text-xs text-red-400 mt-1">{errors.contactEmail}</p>}
             </div>
             <div>
               <label className="admin-label">Contact Phone</label>
@@ -247,24 +282,26 @@ export default function AdminChurchForm() {
           </div>
         </div>
 
-        {/* Status */}
+        {/* Status — MULTI-CHURCH only: deactivating the single church would take the public site offline */}
+        {!isProfile && (
         <div className="admin-card p-5">
           <label className="flex items-center gap-3 cursor-pointer">
             <input
               type="checkbox"
               checked={form.isActive}
               onChange={(e) => set('isActive', e.target.checked)}
-              className="w-4 h-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+              className="w-4 h-4 text-indigo-400 border-gray-700 rounded focus:ring-indigo-500"
             />
             <div>
-              <p className="text-sm font-medium text-gray-900">Active Church</p>
-              <p className="text-xs text-gray-500">Inactive churches are hidden from the public site</p>
+              <p className="text-sm font-medium text-gray-100">Active Church</p>
+              <p className="text-xs text-gray-400">Inactive churches are hidden from the public site</p>
             </div>
           </label>
         </div>
+        )}
 
         <div className="flex justify-end gap-3 pt-2">
-          <Link to="/admin/churches" className="btn-secondary">Cancel</Link>
+          {!isProfile && <Link to="/admin/churches" className="btn-secondary">Cancel</Link>}
           <button type="submit" disabled={isPending} className="btn-primary px-6">
             {isPending && <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />}
             {isPending ? 'Saving…' : isEdit ? 'Save Changes' : 'Create Church'}

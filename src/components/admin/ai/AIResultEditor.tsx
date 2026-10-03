@@ -116,7 +116,7 @@ export default function AIResultEditor({ job, initialTitle, church }: AIResultEd
       </div>
 
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+        <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-lg text-sm text-red-300">
           <AlertCircle className="h-4 w-4 flex-shrink-0" />
           {error}
         </div>

@@ -30,7 +30,7 @@ export default function AdminSermonEdit() {
   if (isLoading) {
     return (
       <div className="max-w-3xl">
-        <div className="h-8 w-32 bg-gray-200 rounded animate-pulse mb-6" />
+        <div className="h-8 w-32 bg-gray-800 rounded animate-pulse mb-6" />
         <SermonDetailSkeleton />
       </div>
     );
@@ -39,7 +39,7 @@ export default function AdminSermonEdit() {
   if (isError || !sermon) {
     return (
       <div className="text-center py-20">
-        <p className="text-gray-500 mb-4">Sermon not found.</p>
+        <p className="text-gray-400 mb-4">Sermon not found.</p>
         <Link to="/admin/sermons" className="btn-secondary">Back to Sermons</Link>
       </div>
     );
@@ -48,12 +48,12 @@ export default function AdminSermonEdit() {
   return (
     <div className="max-w-3xl">
       <div className="flex items-center gap-3 mb-6">
-        <Link to="/admin/sermons" className="p-2 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors">
+        <Link to="/admin/sermons" className="p-2 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors">
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Edit Sermon</h1>
-          <p className="text-sm text-gray-500 mt-0.5 line-clamp-1">{sermon.title}</p>
+          <h1 className="text-xl font-bold text-gray-100">Edit Sermon</h1>
+          <p className="text-sm text-gray-400 mt-0.5 line-clamp-1">{sermon.title}</p>
         </div>
       </div>
       <SermonForm

@@ -21,41 +21,41 @@ export default function AdminProfile() {
 
       {/* Avatar + name */}
       <div className="admin-card p-6 flex items-center gap-5">
-        <div className="w-14 h-14 bg-indigo-100 border-2 border-indigo-200 rounded-2xl flex items-center justify-center flex-shrink-0">
-          <User className="h-7 w-7 text-indigo-600" />
+        <div className="w-14 h-14 bg-indigo-500/15 border-2 border-indigo-500/25 rounded-2xl flex items-center justify-center flex-shrink-0">
+          <User className="h-7 w-7 text-indigo-400" />
         </div>
         <div>
-          <h2 className="text-lg font-bold text-gray-900">{currentUser?.name}</h2>
+          <h2 className="text-lg font-bold text-gray-100">{currentUser?.name}</h2>
           <span className="inline-block mt-1 text-xs font-semibold uppercase tracking-wider
-            text-indigo-700 bg-indigo-50 border border-indigo-200 px-2.5 py-0.5 rounded-full">
+            text-indigo-300 bg-indigo-500/10 border border-indigo-500/25 px-2.5 py-0.5 rounded-full">
             {roleLabel}
           </span>
         </div>
       </div>
 
       {/* Details */}
-      <div className="admin-card divide-y divide-gray-100">
+      <div className="admin-card divide-y divide-gray-800">
         <div className="flex items-center gap-4 px-5 py-4">
-          <Mail className="h-4 w-4 text-gray-400 flex-shrink-0" />
+          <Mail className="h-4 w-4 text-gray-500 flex-shrink-0" />
           <div>
-            <p className="text-xs text-gray-400 mb-0.5">Email address</p>
-            <p className="text-sm font-medium text-gray-900">{currentUser?.email}</p>
+            <p className="text-xs text-gray-500 mb-0.5">Email address</p>
+            <p className="text-sm font-medium text-gray-100">{currentUser?.email}</p>
           </div>
         </div>
         <div className="flex items-center gap-4 px-5 py-4">
-          <Shield className="h-4 w-4 text-gray-400 flex-shrink-0" />
+          <Shield className="h-4 w-4 text-gray-500 flex-shrink-0" />
           <div>
-            <p className="text-xs text-gray-400 mb-0.5">Role</p>
-            <p className="text-sm font-medium text-gray-900">{roleLabel}</p>
+            <p className="text-xs text-gray-500 mb-0.5">Role</p>
+            <p className="text-sm font-medium text-gray-100">{roleLabel}</p>
           </div>
         </div>
       </div>
 
       {/* Church context */}
-      <div className="admin-card p-5 bg-gray-50">
-        <p className="text-xs text-gray-400 mb-1">Current Church (MVP)</p>
-        <p className="text-sm font-semibold text-gray-900">P.C.E.A Emmanuel Thome Church</p>
-        <p className="text-xs text-gray-400 mt-2">Multi-church support can be enabled in a future update.</p>
+      <div className="admin-card p-5 bg-gray-800/40">
+        <p className="text-xs text-gray-500 mb-1">Current Church (MVP)</p>
+        <p className="text-sm font-semibold text-gray-100">P.C.E.A Emmanuel Thome Church</p>
+        <p className="text-xs text-gray-500 mt-2">Multi-church support can be enabled in a future update.</p>
       </div>
 
       {/* Sign out */}

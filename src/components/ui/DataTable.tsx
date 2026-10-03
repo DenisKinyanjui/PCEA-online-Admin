@@ -23,24 +23,24 @@ export default function DataTable<T>({
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-50 border-b border-gray-200">
+            <tr className="bg-gray-800/40 border-b border-gray-800">
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider ${col.className ?? ''}`}
+                  className={`text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider ${col.className ?? ''}`}
                 >
                   {col.header}
                 </th>
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-gray-800">
             {isLoading
               ? [...Array(skeletonRows)].map((_, i) => (
                   <tr key={i}>
                     {columns.map((col) => (
                       <td key={col.key} className="px-4 py-3.5">
-                        <div className="h-4 bg-gray-200 rounded animate-pulse w-3/4" />
+                        <div className="h-4 bg-gray-800 rounded animate-pulse w-3/4" />
                       </td>
                     ))}
                   </tr>
@@ -48,10 +48,10 @@ export default function DataTable<T>({
               : data.map((item) => (
                   <tr
                     key={keyExtractor(item)}
-                    className="hover:bg-gray-50 transition-colors"
+                    className="hover:bg-gray-800/40 transition-colors"
                   >
                     {columns.map((col) => (
-                      <td key={col.key} className={`px-4 py-3.5 text-gray-700 ${col.className ?? ''}`}>
+                      <td key={col.key} className={`px-4 py-3.5 text-gray-300 ${col.className ?? ''}`}>
                         {col.render ? col.render(item) : (item as Record<string, unknown>)[col.key] as ReactNode}
                       </td>
                     ))}

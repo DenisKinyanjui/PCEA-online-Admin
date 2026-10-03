@@ -13,6 +13,11 @@ export const ROUTE_PERMISSIONS: Record<string, UserRole[]> = {
   sermons:   ALL_ROLES,
   uploads:   ALL_ROLES,
   profile:   ALL_ROLES,
+  // MULTI-CHURCH: church list / create (super admin only) — route currently disabled.
   churches:  ['super_admin'],
+  // Single-church profile page (backend lets church_admin edit only their own church).
+  churchProfile: ['super_admin', 'church_admin'],
   users:     ['super_admin'],
+  announcements: ['super_admin', 'church_admin'],
+  youthMessages: ['super_admin', 'church_admin'],
 };

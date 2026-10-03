@@ -218,7 +218,7 @@ export interface AIResult {
 export interface SermonJob {
   _id: string;
   sourceFileUrl: string;
-  sourceFileType: 'audio' | 'document';
+  sourceFileType: 'audio' | 'video' | 'document';
   originalFileName: string;
   userPrompt: string;
   church: string;
@@ -240,7 +240,7 @@ export interface AIUploadResponse {
   success: boolean;
   jobId: string;
   fileUrl: string;
-  fileType: 'audio' | 'document';
+  fileType: 'audio' | 'video' | 'document';
   originalFileName: string;
   filename: string;
 }
@@ -266,6 +266,59 @@ export interface CreateSermonFromAIInput {
   church?: string;
   audioUrl?: string;
   video?: SermonVideo | null;
+}
+
+// ─── Announcements ───────────────────────────────────────────────────────────
+
+export interface ApiAnnouncement {
+  _id: string;
+  title: string;
+  description: string;
+  expiresAt: string;
+  church: string;
+  /** Path relative to the API base URL, or null when there is no poster. */
+  imagePath: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AnnouncementListResponse {
+  success: boolean;
+  total: number;
+  data: ApiAnnouncement[];
+}
+
+export interface AnnouncementInput {
+  title: string;
+  description: string;
+  /** ISO timestamp */
+  expiresAt: string;
+  church?: string;
+  image?: File | null;
+  removeImage?: boolean;
+}
+
+// ─── Message to the Youth ────────────────────────────────────────────────────
+
+export interface ApiYouthMessage {
+  _id: string;
+  minister: string;
+  message: string;
+  bibleVerse: string;
+  /** Service date, stored at 12:00 UTC — format with timeZone: 'UTC'. */
+  date: string;
+  church: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface YouthMessageInput {
+  minister: string;
+  message: string;
+  bibleVerse: string;
+  /** YYYY-MM-DD */
+  date: string;
+  church?: string;
 }
 
 // ─── Toast ───────────────────────────────────────────────────────────────────

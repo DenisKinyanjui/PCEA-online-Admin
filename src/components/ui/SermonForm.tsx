@@ -28,7 +28,8 @@ interface FormState {
 
 interface SermonFormProps {
   initialData?: ApiSermon;
-  churches: ApiChurch[];
+  /** MULTI-CHURCH: options for the (disabled) church selector. */
+  churches?: ApiChurch[];
   onSubmit: (data: CreateSermonInput) => Promise<void>;
   isSubmitting: boolean;
   submitLabel?: string;
@@ -64,9 +65,12 @@ function toFormState(sermon: ApiSermon | undefined, defaultChurch: string): Form
   };
 }
 
-export default function SermonForm({ initialData, churches, onSubmit, isSubmitting, submitLabel = 'Save Sermon' }: SermonFormProps) {
-  const { churchFilter, isSuperAdmin } = useChurch();
-  const defaultChurch = churchFilter ?? initialData?.church ?? '';
+export default function SermonForm({ initialData, /* churches, */ onSubmit, isSubmitting, submitLabel = 'Save Sermon' }: SermonFormProps) {
+  // MULTI-CHURCH: super admins picked the church from `churches`; now always the configured church.
+  // const { churchFilter, isSuperAdmin } = useChurch();
+  // const defaultChurch = churchFilter ?? initialData?.church ?? '';
+  const { churchFilter } = useChurch();
+  const defaultChurch = churchFilter;
 
   const [form, setForm] = useState<FormState>(() => toFormState(initialData, defaultChurch));
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
@@ -87,7 +91,7 @@ export default function SermonForm({ initialData, churches, onSubmit, isSubmitti
     if (!form.title.trim()) e.title = 'Title is required';
     if (!form.preacher.trim()) e.preacher = 'Preacher is required';
     if (!form.date) e.date = 'Date is required';
-    if (isSuperAdmin && !form.church) e.church = 'Church is required';
+    // MULTI-CHURCH: if (isSuperAdmin && !form.church) e.church = 'Church is required';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -121,12 +125,12 @@ export default function SermonForm({ initialData, churches, onSubmit, isSubmitti
       <button
         type="button"
         onClick={() => setOpenSection(openSection === id ? null : id)}
-        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-50 transition-colors"
+        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-800/40 transition-colors"
       >
-        <span className="text-sm font-semibold text-gray-900">{label}</span>
-        {openSection === id ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />}
+        <span className="text-sm font-semibold text-gray-100">{label}</span>
+        {openSection === id ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
       </button>
-      {openSection === id && <div className="px-5 pb-6 border-t border-gray-100 pt-5">{children}</div>}
+      {openSection === id && <div className="px-5 pb-6 border-t border-gray-800 pt-5">{children}</div>}
     </div>
   );
 
@@ -134,45 +138,53 @@ export default function SermonForm({ initialData, churches, onSubmit, isSubmitti
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Core fields */}
       <div className="admin-card p-5 space-y-5">
-        <h2 className="text-sm font-semibold text-gray-900">Basic Information</h2>
+        <h2 className="text-sm font-semibold text-gray-100">Basic Information</h2>
 
         <div>
-          <label className="admin-label">Title <span className="text-red-500">*</span></label>
+          <label className="admin-label">Title <span className="text-red-400">*</span></label>
           <input
             value={form.title}
             onChange={(e) => set('title', e.target.value)}
             placeholder="e.g. Walking in Faith"
             className={`admin-input ${errors.title ? 'border-red-400' : ''}`}
           />
-          {errors.title && <p className="text-xs text-red-500 mt-1">{errors.title}</p>}
+          {errors.title && <p className="text-xs text-red-400 mt-1">{errors.title}</p>}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="admin-label">Preacher <span className="text-red-500">*</span></label>
+            <label className="admin-label">Preacher <span className="text-red-400">*</span></label>
             <input
               value={form.preacher}
               onChange={(e) => set('preacher', e.target.value)}
               placeholder="e.g. Rev. James Kariuki"
               className={`admin-input ${errors.preacher ? 'border-red-400' : ''}`}
             />
-            {errors.preacher && <p className="text-xs text-red-500 mt-1">{errors.preacher}</p>}
+            {errors.preacher && <p className="text-xs text-red-400 mt-1">{errors.preacher}</p>}
           </div>
           <div>
-            <label className="admin-label">Date <span className="text-red-500">*</span></label>
+            <label className="admin-label">Date <span className="text-red-400">*</span></label>
             <input
               type="date"
               value={form.date}
               onChange={(e) => set('date', e.target.value)}
               className={`admin-input ${errors.date ? 'border-red-400' : ''}`}
             />
-            {errors.date && <p className="text-xs text-red-500 mt-1">{errors.date}</p>}
+            {errors.date && <p className="text-xs text-red-400 mt-1">{errors.date}</p>}
           </div>
         </div>
 
-        {/* Church selector — super_admin can choose; others see a locked badge */}
+        {/* Church — locked to the platform's single church */}
         <div>
-          <label className="admin-label">Church <span className="text-red-500">*</span></label>
+          <label className="admin-label">Church</label>
+          <div className="admin-input bg-gray-800/40 text-gray-400 cursor-not-allowed">
+            {form.church}
+          </div>
+        </div>
+
+        {/* MULTI-CHURCH: church selector — super_admin could choose; others saw a locked badge.
+        <div>
+          <label className="admin-label">Church <span className="text-red-400">*</span></label>
           {isSuperAdmin ? (
             <>
               <div className="relative">
@@ -186,16 +198,17 @@ export default function SermonForm({ initialData, churches, onSubmit, isSubmitti
                     <option key={c._id} value={c.name}>{c.name}</option>
                   ))}
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-500 pointer-events-none" />
               </div>
-              {errors.church && <p className="text-xs text-red-500 mt-1">{errors.church}</p>}
+              {errors.church && <p className="text-xs text-red-400 mt-1">{errors.church}</p>}
             </>
           ) : (
-            <div className="admin-input bg-gray-50 text-gray-500 cursor-not-allowed">
+            <div className="admin-input bg-gray-800/40 text-gray-400 cursor-not-allowed">
               {form.church || 'No church assigned'}
             </div>
           )}
         </div>
+        */}
 
         <div>
           <label className="admin-label">Summary</label>
@@ -231,9 +244,9 @@ export default function SermonForm({ initialData, churches, onSubmit, isSubmitti
             />
           </div>
           <div className="relative flex items-center gap-3">
-            <div className="flex-1 border-t border-gray-200" />
-            <span className="text-xs text-gray-400 flex-shrink-0">or upload file</span>
-            <div className="flex-1 border-t border-gray-200" />
+            <div className="flex-1 border-t border-gray-800" />
+            <span className="text-xs text-gray-500 flex-shrink-0">or upload file</span>
+            <div className="flex-1 border-t border-gray-800" />
           </div>
           <UploadField type="audio" label="Upload Audio" onUploadComplete={(url) => set('audioUrl', url)} />
 
@@ -246,7 +259,7 @@ export default function SermonForm({ initialData, churches, onSubmit, isSubmitti
                   <option value="youtube">YouTube</option>
                   <option value="file">Direct URL</option>
                 </select>
-                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-400 pointer-events-none" />
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-gray-500 pointer-events-none" />
               </div>
             </div>
             {form.videoType && (
@@ -281,9 +294,9 @@ export default function SermonForm({ initialData, churches, onSubmit, isSubmitti
             </div>
             <div className="space-y-4">
               {form.points.map((point, i) => (
-                <div key={i} className="bg-gray-50 border border-gray-200 rounded-xl p-4 space-y-3">
+                <div key={i} className="bg-gray-800/40 border border-gray-800 rounded-xl p-4 space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Point {i + 1}</span>
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Point {i + 1}</span>
                     {form.points.length > 1 && (
                       <button type="button" onClick={() => removePoint(i)} className="btn-danger text-xs py-1 px-2">
                         <Trash2 className="h-3 w-3" />
@@ -293,7 +306,7 @@ export default function SermonForm({ initialData, churches, onSubmit, isSubmitti
                   <input value={point.title} onChange={(e) => updatePoint(i, 'title', e.target.value)} placeholder="Point title…" className="admin-input" />
                   <textarea value={point.description} onChange={(e) => updatePoint(i, 'description', e.target.value)} placeholder="Point description…" className="admin-textarea" rows={3} />
                   <div>
-                    <label className="text-xs text-gray-500 mb-1.5 block">Key Verses</label>
+                    <label className="text-xs text-gray-400 mb-1.5 block">Key Verses</label>
                     <TagInput tags={point.verses} onChange={(tags) => updatePoint(i, 'verses', tags)} placeholder="Add verse (e.g. Romans 8:28), press Enter…" />
                   </div>
                 </div>

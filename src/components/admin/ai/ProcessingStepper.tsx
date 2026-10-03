@@ -36,8 +36,8 @@ export default function ProcessingStepper({ job }: ProcessingStepperProps) {
             <div className="flex-shrink-0 mt-0.5">
               {isDone && <CheckCircle className="h-5 w-5 text-emerald-500" />}
               {isProcessing && <Loader className="h-5 w-5 text-indigo-500 animate-spin" />}
-              {isFailed && <XCircle className="h-5 w-5 text-red-500" />}
-              {isPending && <Circle className="h-5 w-5 text-gray-300" />}
+              {isFailed && <XCircle className="h-5 w-5 text-red-400" />}
+              {isPending && <Circle className="h-5 w-5 text-gray-600" />}
             </div>
 
             {/* Text */}
@@ -46,12 +46,12 @@ export default function ProcessingStepper({ job }: ProcessingStepperProps) {
                 <span
                   className={`text-sm font-medium ${
                     isDone
-                      ? 'text-emerald-700'
+                      ? 'text-emerald-300'
                       : isProcessing
-                      ? 'text-indigo-700'
+                      ? 'text-indigo-300'
                       : isFailed
-                      ? 'text-red-700'
-                      : 'text-gray-400'
+                      ? 'text-red-300'
+                      : 'text-gray-500'
                   }`}
                 >
                   {step.label}
@@ -62,7 +62,7 @@ export default function ProcessingStepper({ job }: ProcessingStepperProps) {
               </div>
               <p
                 className={`text-xs mt-0.5 ${
-                  isPending ? 'text-gray-300' : 'text-gray-500'
+                  isPending ? 'text-gray-600' : 'text-gray-400'
                 }`}
               >
                 {isFailed && stage.error ? stage.error : step.description}
@@ -71,7 +71,7 @@ export default function ProcessingStepper({ job }: ProcessingStepperProps) {
 
             {/* Step number for pending */}
             {isPending && (
-              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-100 text-gray-400 text-xs flex items-center justify-center font-medium mt-0.5">
+              <span className="flex-shrink-0 w-5 h-5 rounded-full bg-gray-800 text-gray-500 text-xs flex items-center justify-center font-medium mt-0.5">
                 {idx + 1}
               </span>
             )}

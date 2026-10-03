@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback, type DragEvent, type ChangeEvent } from 'react';
 import {
   Upload, Music, FileText, Sparkles, XCircle, Loader, AlertCircle,
-  RefreshCw, CheckCircle, Brain, ArrowLeft,
+  RefreshCw, CheckCircle, Brain, ArrowLeft, Video,
 } from 'lucide-react';
 import PageHeader from '../components/ui/PageHeader';
 import ProcessingStepper from '../components/admin/ai/ProcessingStepper';
@@ -10,18 +10,28 @@ import AIResultEditor from '../components/admin/ai/AIResultEditor';
 import AIStatusBadge from '../components/admin/ai/AIStatusBadge';
 import { aiUploadFile, triggerAIProcess, getAIJobStatus } from '../api/uploadApi';
 import { useToast } from '../context/ToastContext';
-import { useAuth } from '../context/AuthContext';
+// MULTI-CHURCH: church came from the signed-in user.
+// import { useAuth } from '../context/AuthContext';
+import { CHURCH_NAME } from '../config/church';
 import type { SermonJob } from '../types';
 
 type PipelineStep = 'upload' | 'confirm' | 'processing' | 'result';
 
-const ALLOWED_AUDIO = ['audio/mpeg', 'audio/mp4', 'audio/wav', 'audio/ogg'];
+// Mirrors the backend list — the server converts any of these to MP3 for transcription
+const ALLOWED_AUDIO = [
+  'audio/mpeg', 'audio/mp3',
+  'audio/mp4', 'audio/x-m4a', 'audio/m4a', 'audio/aac',
+  'audio/wav', 'audio/x-wav', 'audio/wave',
+  'audio/ogg', 'audio/webm',
+];
 const ALLOWED_DOCS = [
   'application/pdf',
   'application/msword',
   'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
   'text/plain',
 ];
+// Video: the server extracts the audio track for transcription and the published sermon shows the video
+const ALLOWED_VIDEO = ['video/mp4', 'video/webm', 'video/quicktime'];
 const MAX_BYTES = 100 * 1024 * 1024; // 100 MB
 const POLL_INTERVAL_MS = 2500;
 
@@ -33,7 +43,7 @@ function formatBytes(bytes: number) {
 
 export default function AdminUploads() {
   const toast = useToast();
-  const { currentUser } = useAuth();
+  // const { currentUser } = useAuth();
 
   const [step, setStep] = useState<PipelineStep>('upload');
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -85,8 +95,8 @@ export default function AdminUploads() {
   useEffect(() => () => stopPolling(), [stopPolling]);
 
   const validateFile = (file: File): string => {
-    if (![...ALLOWED_AUDIO, ...ALLOWED_DOCS].includes(file.type)) {
-      return 'Unsupported file type. Allowed: MP3, MP4, WAV, OGG, PDF, DOC, DOCX';
+    if (![...ALLOWED_AUDIO, ...ALLOWED_VIDEO, ...ALLOWED_DOCS].includes(file.type)) {
+      return 'Unsupported file type. Allowed: MP3, M4A, WAV, OGG, AAC audio, MP4/WebM/MOV video, PDF, DOC, DOCX';
     }
     if (file.size > MAX_BYTES) {
       return `File too large (${formatBytes(file.size)}). Maximum is 100 MB`;
@@ -104,7 +114,8 @@ export default function AdminUploads() {
     setUploadProgress(0);
 
     try {
-      const church = currentUser?.role !== 'super_admin' ? undefined : undefined;
+      // MULTI-CHURCH: const church = currentUser?.role !== 'super_admin' ? undefined : undefined;
+      const church = CHURCH_NAME;
       const res = await aiUploadFile(file, church, setUploadProgress);
       setJobId(res.jobId);
       setStep('confirm');
@@ -178,6 +189,7 @@ export default function AdminUploads() {
   };
 
   const isAudio = selectedFile ? ALLOWED_AUDIO.includes(selectedFile.type) : false;
+  const isVideo = selectedFile ? ALLOWED_VIDEO.includes(selectedFile.type) : false;
 
   const stepLabels = [
     { key: 'upload', label: 'Upload File' },
@@ -191,7 +203,7 @@ export default function AdminUploads() {
     <div className="space-y-6">
       <PageHeader
         title="AI Sermon Builder"
-        description="Upload audio or documents — AI transcribes, structures, and extracts sermon content automatically"
+        description="Upload audio, video or documents — AI transcribes, structures, and extracts sermon content automatically"
       />
 
       {/* Progress Steps */}
@@ -206,14 +218,14 @@ export default function AdminUploads() {
                       ? 'bg-emerald-500 border-emerald-500 text-white'
                       : idx === currentStepIdx
                       ? 'bg-indigo-600 border-indigo-600 text-white'
-                      : 'bg-white border-gray-200 text-gray-400'
+                      : 'bg-gray-900 border-gray-800 text-gray-500'
                   }`}
                 >
                   {idx < currentStepIdx ? <CheckCircle className="h-4 w-4" /> : idx + 1}
                 </div>
                 <span
                   className={`text-xs font-medium text-center leading-tight ${
-                    idx <= currentStepIdx ? 'text-gray-800' : 'text-gray-400'
+                    idx <= currentStepIdx ? 'text-gray-200' : 'text-gray-500'
                   }`}
                 >
                   {s.label}
@@ -222,7 +234,7 @@ export default function AdminUploads() {
               {idx < stepLabels.length - 1 && (
                 <div
                   className={`h-0.5 flex-1 mb-5 transition-colors ${
-                    idx < currentStepIdx ? 'bg-emerald-400' : 'bg-gray-200'
+                    idx < currentStepIdx ? 'bg-emerald-400' : 'bg-gray-800'
                   }`}
                 />
               )}
@@ -235,12 +247,12 @@ export default function AdminUploads() {
       {step === 'upload' && (
         <div className="admin-card p-6 space-y-4">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-9 h-9 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-center">
-              <Brain className="h-4 w-4 text-indigo-600" />
+            <div className="w-9 h-9 bg-indigo-500/10 border border-indigo-500/25 rounded-xl flex items-center justify-center">
+              <Brain className="h-4 w-4 text-indigo-400" />
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-gray-900">Upload Sermon File</h3>
-              <p className="text-xs text-gray-500">Audio or document — AI will process it</p>
+              <h3 className="text-sm font-semibold text-gray-100">Upload Sermon File</h3>
+              <p className="text-xs text-gray-400">Audio, video or document — AI will process it</p>
             </div>
           </div>
 
@@ -252,19 +264,19 @@ export default function AdminUploads() {
             onDrop={handleDrop}
             className={`border-2 border-dashed rounded-xl p-10 text-center transition-all ${
               uploading
-                ? 'border-indigo-300 bg-indigo-50 cursor-default'
+                ? 'border-indigo-500/40 bg-indigo-500/10 cursor-default'
                 : isDragging
-                ? 'border-indigo-400 bg-indigo-50 cursor-copy scale-[1.01]'
-                : 'border-gray-300 hover:border-indigo-400 hover:bg-gray-50 cursor-pointer'
+                ? 'border-indigo-400 bg-indigo-500/10 cursor-copy scale-[1.01]'
+                : 'border-gray-700 hover:border-indigo-400 hover:bg-gray-800/40 cursor-pointer'
             }`}
           >
             {uploading ? (
               <div className="space-y-4 max-w-xs mx-auto">
                 <Loader className="h-8 w-8 text-indigo-500 animate-spin mx-auto" />
-                <p className="text-sm font-medium text-indigo-700">
+                <p className="text-sm font-medium text-indigo-300">
                   Uploading{selectedFile ? ` "${selectedFile.name}"` : ''}…
                 </p>
-                <div className="h-2 bg-indigo-100 rounded-full overflow-hidden">
+                <div className="h-2 bg-indigo-500/15 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-indigo-500 rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
@@ -274,38 +286,45 @@ export default function AdminUploads() {
               </div>
             ) : (
               <>
-                <Upload className="h-10 w-10 text-gray-300 mx-auto mb-3" />
-                <p className="text-sm text-gray-600">
-                  <span className="text-indigo-600 font-semibold">Click to upload</span> or drag & drop
+                <Upload className="h-10 w-10 text-gray-600 mx-auto mb-3" />
+                <p className="text-sm text-gray-400">
+                  <span className="text-indigo-400 font-semibold">Click to upload</span> or drag & drop
                 </p>
-                <p className="text-xs text-gray-400 mt-2">
-                  Audio: MP3, MP4, WAV, OGG &nbsp;·&nbsp; Documents: PDF, DOC, DOCX &nbsp;·&nbsp; Max 100 MB
+                <p className="text-xs text-gray-500 mt-2">
+                  Audio: MP3, M4A, WAV, OGG &nbsp;·&nbsp; Video: MP4, WebM, MOV &nbsp;·&nbsp; Documents: PDF, DOC, DOCX &nbsp;·&nbsp; Max 100 MB
                 </p>
               </>
             )}
           </div>
 
           {uploadError && (
-            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-lg text-sm text-red-300">
               <XCircle className="h-4 w-4 flex-shrink-0" />
               {uploadError}
             </div>
           )}
 
           {/* Format hints */}
-          <div className="grid grid-cols-2 gap-3">
-            <div className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="flex items-center gap-2 p-3 bg-gray-800/40 border border-gray-800 rounded-lg">
               <Music className="h-4 w-4 text-indigo-500 flex-shrink-0" />
               <div>
-                <p className="text-xs font-medium text-gray-700">Audio Sermon</p>
-                <p className="text-xs text-gray-400">MP3 · MP4 · WAV · OGG</p>
+                <p className="text-xs font-medium text-gray-300">Audio Sermon</p>
+                <p className="text-xs text-gray-500">MP3 · M4A · WAV · OGG</p>
               </div>
             </div>
-            <div className="flex items-center gap-2 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+            <div className="flex items-center gap-2 p-3 bg-gray-800/40 border border-gray-800 rounded-lg">
+              <Video className="h-4 w-4 text-rose-500 flex-shrink-0" />
+              <div>
+                <p className="text-xs font-medium text-gray-300">Video Sermon</p>
+                <p className="text-xs text-gray-500">MP4 · WebM · MOV</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2 p-3 bg-gray-800/40 border border-gray-800 rounded-lg">
               <FileText className="h-4 w-4 text-emerald-500 flex-shrink-0" />
               <div>
-                <p className="text-xs font-medium text-gray-700">Written Document</p>
-                <p className="text-xs text-gray-400">PDF · DOC · DOCX</p>
+                <p className="text-xs font-medium text-gray-300">Written Document</p>
+                <p className="text-xs text-gray-500">PDF · DOC · DOCX</p>
               </div>
             </div>
           </div>
@@ -313,7 +332,7 @@ export default function AdminUploads() {
           <input
             ref={inputRef}
             type="file"
-            accept=".mp3,.mp4,.wav,.ogg,audio/*,.pdf,.doc,.docx"
+            accept=".mp3,.m4a,.aac,.wav,.ogg,audio/*,.mp4,.webm,.mov,video/mp4,video/webm,video/quicktime,.pdf,.doc,.docx"
             onChange={(e: ChangeEvent<HTMLInputElement>) => {
               if (e.target.files?.[0]) handleFile(e.target.files[0]);
             }}
@@ -331,20 +350,24 @@ export default function AdminUploads() {
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
                   isAudio
-                    ? 'bg-indigo-50 border-indigo-200'
-                    : 'bg-emerald-50 border-emerald-200'
+                    ? 'bg-indigo-500/10 border-indigo-500/25'
+                    : isVideo
+                    ? 'bg-rose-500/10 border-rose-500/25'
+                    : 'bg-emerald-500/10 border-emerald-500/25'
                 }`}
               >
                 {isAudio ? (
-                  <Music className="h-5 w-5 text-indigo-600" />
+                  <Music className="h-5 w-5 text-indigo-400" />
+                ) : isVideo ? (
+                  <Video className="h-5 w-5 text-rose-400" />
                 ) : (
-                  <FileText className="h-5 w-5 text-emerald-600" />
+                  <FileText className="h-5 w-5 text-emerald-400" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">{selectedFile.name}</p>
-                <p className="text-xs text-gray-400">
-                  {isAudio ? 'Audio file' : 'Document'} · {formatBytes(selectedFile.size)}
+                <p className="text-sm font-semibold text-gray-100 truncate">{selectedFile.name}</p>
+                <p className="text-xs text-gray-500">
+                  {isAudio ? 'Audio file' : isVideo ? 'Video file · audio will be transcribed' : 'Document'} · {formatBytes(selectedFile.size)}
                 </p>
               </div>
               <AIStatusBadge status="uploaded" />
@@ -354,11 +377,11 @@ export default function AdminUploads() {
           {/* Prompt card */}
           <div className="admin-card p-5 space-y-4">
             <div>
-              <h3 className="text-sm font-semibold text-gray-900 mb-1">
+              <h3 className="text-sm font-semibold text-gray-100 mb-1">
                 Add Context for AI{' '}
-                <span className="text-xs font-normal text-gray-400">(optional)</span>
+                <span className="text-xs font-normal text-gray-500">(optional)</span>
               </h3>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-400">
                 Help the AI understand the sermon better — specify the preacher, series, date, or
                 special instructions.
               </p>
@@ -371,10 +394,10 @@ export default function AdminUploads() {
               className="admin-input w-full resize-none"
               placeholder={`e.g. "Preached by Rev. James Waweru on Easter Sunday 2024. Part of the 'Resurrection Power' series. Focus on extracting practical life application points."`}
             />
-            <p className="text-xs text-gray-400 text-right">{userPrompt.length}/1000</p>
+            <p className="text-xs text-gray-500 text-right">{userPrompt.length}/1000</p>
 
             {processError && (
-              <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+              <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-lg text-sm text-red-300">
                 <AlertCircle className="h-4 w-4 flex-shrink-0" />
                 {processError}
               </div>
@@ -411,12 +434,12 @@ export default function AdminUploads() {
           <div className="admin-card p-5 space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-indigo-50 border border-indigo-200 rounded-xl flex items-center justify-center">
-                  <Brain className="h-4 w-4 text-indigo-600" />
+                <div className="w-9 h-9 bg-indigo-500/10 border border-indigo-500/25 rounded-xl flex items-center justify-center">
+                  <Brain className="h-4 w-4 text-indigo-400" />
                 </div>
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900">AI is processing your sermon</h3>
-                  <p className="text-xs text-gray-500 truncate max-w-xs">{job.originalFileName}</p>
+                  <h3 className="text-sm font-semibold text-gray-100">AI is processing your sermon</h3>
+                  <p className="text-xs text-gray-400 truncate max-w-xs">{job.originalFileName}</p>
                 </div>
               </div>
               <AIStatusBadge status={job.status} />
@@ -426,7 +449,7 @@ export default function AdminUploads() {
 
             {job.status === 'failed' && (
               <div className="space-y-3">
-                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+                <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/25 rounded-lg text-sm text-red-300">
                   <XCircle className="h-4 w-4 flex-shrink-0" />
                   {job.errorMessage || 'Processing failed. Please try again.'}
                 </div>
@@ -463,12 +486,12 @@ export default function AdminUploads() {
           {/* Header */}
           <div className="admin-card p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-center">
-                <CheckCircle className="h-4 w-4 text-emerald-600" />
+              <div className="w-9 h-9 bg-emerald-500/10 border border-emerald-500/25 rounded-xl flex items-center justify-center">
+                <CheckCircle className="h-4 w-4 text-emerald-400" />
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-gray-900">AI Processing Complete</h3>
-                <p className="text-xs text-gray-500">{job.originalFileName}</p>
+                <h3 className="text-sm font-semibold text-gray-100">AI Processing Complete</h3>
+                <p className="text-xs text-gray-400">{job.originalFileName}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -486,7 +509,7 @@ export default function AdminUploads() {
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
             {/* Left: AI Preview */}
             <div className="space-y-1">
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-1 mb-3">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-3">
                 AI Generated Content
               </h3>
               <AISermonPreviewCard
@@ -498,14 +521,14 @@ export default function AdminUploads() {
 
             {/* Right: Editor */}
             <div>
-              <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide px-1 mb-3">
+              <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-3">
                 Publish Sermon
               </h3>
               <div className="admin-card p-5">
                 <AIResultEditor
                   job={job}
                   initialTitle={selectedTitle}
-                  church={currentUser?.church?.name}
+                  church={CHURCH_NAME} // MULTI-CHURCH: currentUser?.church?.name
                 />
               </div>
             </div>

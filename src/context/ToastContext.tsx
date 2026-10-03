@@ -20,9 +20,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const dismiss = (id: string) => setToasts((prev) => prev.filter((t) => t.id !== id));
 
   const styles: Record<ToastType, string> = {
-    success: 'border-l-4 border-l-emerald-500 bg-white text-emerald-700',
-    error:   'border-l-4 border-l-red-500 bg-white text-red-700',
-    info:    'border-l-4 border-l-indigo-500 bg-white text-indigo-700',
+    success: 'border-l-4 border-l-emerald-500 bg-gray-900 text-emerald-300',
+    error:   'border-l-4 border-l-red-500 bg-gray-900 text-red-300',
+    info:    'border-l-4 border-l-indigo-500 bg-gray-900 text-indigo-300',
   };
   const icons: Record<ToastType, typeof CheckCircle> = {
     success: CheckCircle,
@@ -39,12 +39,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           return (
             <div
               key={t.id}
-              className={`flex items-start gap-3 p-4 rounded-xl border border-gray-200
+              className={`flex items-start gap-3 p-4 rounded-xl border border-gray-700
                 shadow-lg ${styles[t.type]}`}
             >
               <Icon className="h-4 w-4 mt-0.5 flex-shrink-0" />
               <p className="text-sm font-medium flex-1">{t.message}</p>
-              <button onClick={() => dismiss(t.id)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => dismiss(t.id)} className="text-gray-500 hover:text-gray-400">
                 <X className="h-4 w-4" />
               </button>
             </div>

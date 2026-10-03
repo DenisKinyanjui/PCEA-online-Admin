@@ -57,25 +57,26 @@ export default function AdminSermons() {
       header: 'Title',
       render: (s) => (
         <div>
-          <p className="font-medium text-gray-900 line-clamp-1">{s.title}</p>
+          <p className="font-medium text-gray-100 line-clamp-1">{s.title}</p>
         </div>
       ),
     },
-    { key: 'preacher', header: 'Preacher', render: (s) => <span className="text-gray-500 text-sm">{s.preacher}</span> },
-    {
-      key: 'church',
-      header: 'Church',
-      render: (s) => (
-        <span className="text-xs bg-gray-100 text-gray-600 border border-gray-200 px-2 py-0.5 rounded-full whitespace-nowrap">
-          {s.church}
-        </span>
-      ),
-    },
+    { key: 'preacher', header: 'Preacher', render: (s) => <span className="text-gray-400 text-sm">{s.preacher}</span> },
+    // MULTI-CHURCH: church column (every sermon belongs to the same church now).
+    // {
+    //   key: 'church',
+    //   header: 'Church',
+    //   render: (s) => (
+    //     <span className="text-xs bg-gray-800 text-gray-400 border border-gray-800 px-2 py-0.5 rounded-full whitespace-nowrap">
+    //       {s.church}
+    //     </span>
+    //   ),
+    // },
     {
       key: 'date',
       header: 'Date',
       render: (s) => (
-        <span className="text-gray-400 text-xs whitespace-nowrap">
+        <span className="text-gray-500 text-xs whitespace-nowrap">
           {new Date(s.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
         </span>
       ),
@@ -89,15 +90,15 @@ export default function AdminSermons() {
           <a
             href={`http://localhost:5173/sermons/${s._id}`}
             target="_blank" rel="noopener noreferrer"
-            className="p-1.5 rounded-lg text-gray-400 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+            className="p-1.5 rounded-lg text-gray-500 hover:text-gray-300 hover:bg-gray-800 transition-colors"
             title="View on site"
           >
             <Eye className="h-3.5 w-3.5" />
           </a>
-          <Link to={`/admin/sermons/${s._id}/edit`} className="p-1.5 rounded-lg text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 transition-colors" title="Edit">
+          <Link to={`/admin/sermons/${s._id}/edit`} className="p-1.5 rounded-lg text-gray-500 hover:text-indigo-400 hover:bg-indigo-500/10 transition-colors" title="Edit">
             <Edit2 className="h-3.5 w-3.5" />
           </Link>
-          <button onClick={() => setDeleteTarget({ id: s._id, title: s.title })} className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors" title="Delete">
+          <button onClick={() => setDeleteTarget({ id: s._id, title: s.title })} className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors" title="Delete">
             <Trash2 className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -125,7 +126,7 @@ export default function AdminSermons() {
               {[...Array(totalPages)].map((_, i) => {
                 const p = i + 1;
                 return (
-                  <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-indigo-600 text-white' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'}`}>
+                  <button key={p} onClick={() => setPage(p)} className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${p === page ? 'bg-indigo-600 text-white' : 'text-gray-400 hover:text-gray-100 hover:bg-gray-800'}`}>
                     {p}
                   </button>
                 );
