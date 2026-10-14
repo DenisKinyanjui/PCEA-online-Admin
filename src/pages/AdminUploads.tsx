@@ -203,7 +203,7 @@ export default function AdminUploads() {
     <div className="space-y-6">
       <PageHeader
         title="AI Sermon Builder"
-        description="Upload audio, video or documents — AI transcribes, structures, and extracts sermon content automatically"
+        description="Upload audio, video or documents. AI transcribes, structures, and extracts sermon content automatically"
       />
 
       {/* Progress Steps */}
