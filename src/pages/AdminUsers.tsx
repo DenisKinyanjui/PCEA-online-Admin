@@ -39,6 +39,8 @@ export default function AdminUsers() {
   const [showCreate, setShowCreate] = useState(false);
   const [createForm, setCreateForm] = useState<CreateForm>(emptyCreate);
   const [editTarget, setEditTarget] = useState<ApiAdminUser | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
   const [editRole, setEditRole] = useState<UserRole>('church_admin');
   const [editChurch, setEditChurch] = useState('');
   const [deleteTarget, setDeleteTarget] = useState<ApiAdminUser | null>(null);
@@ -75,13 +77,23 @@ export default function AdminUsers() {
   };
 
   const startEdit = (u: ApiAdminUser) => {
-    setEditTarget(u); setEditRole(u.role); setEditChurch(u.church?.id ?? '');
+    setEditTarget(u);
+    setEditName(u.name);
+    setEditEmail(u.email);
+    setEditRole(u.role);
+    setEditChurch(u.church?.id ?? '');
   };
 
   const handleUpdate = async () => {
     if (!editTarget) return;
+    if (!editName.trim() || !editEmail.trim()) {
+      toast('Name and email are required.', 'error');
+      return;
+    }
     try {
       await updateMutation.mutateAsync({
+        name: editName.trim(),
+        email: editEmail.trim(),
         role: editRole,
         // MULTI-CHURCH: church: editRole === 'super_admin' ? null : (editChurch || null),
         church: editRole === 'super_admin' ? null : (singleChurchId || editChurch || null),
@@ -200,6 +212,29 @@ export default function AdminUsers() {
         <div className="admin-card p-5 space-y-4 border-indigo-500/25 ring-1 ring-indigo-500/20">
           <h3 className="text-sm font-semibold text-gray-100">Editing: {editTarget.name}</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="admin-label" htmlFor="edit-user-name">Name</label>
+              <input
+                id="edit-user-name"
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                className="admin-input"
+                autoComplete="name"
+                required
+              />
+            </div>
+            <div>
+              <label className="admin-label" htmlFor="edit-user-email">Email</label>
+              <input
+                id="edit-user-email"
+                type="email"
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
+                className="admin-input"
+                autoComplete="email"
+                required
+              />
+            </div>
             <div>
               <label className="admin-label">Role</label>
               <select value={editRole} onChange={(e) => setEditRole(e.target.value as UserRole)} className="admin-select">

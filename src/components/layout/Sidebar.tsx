@@ -111,7 +111,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-[1px] z-40 lg:hidden" onClick={onClose} />
       )}
 
-      <aside className={`fixed top-0 left-0 h-full w-64 bg-gray-950/80 border-r border-gray-800
+      <aside className={`fixed top-0 left-0 h-full w-64 bg-blue-900/5 backdrop-blur border-r-4 border-gray-800
         z-50 flex flex-col transition-transform duration-200 ease-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:z-auto`}
