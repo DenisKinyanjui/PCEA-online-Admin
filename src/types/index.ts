@@ -142,6 +142,7 @@ export interface ApiSermonSummary {
 export interface SermonsResponse {
   success: boolean;
   total: number;
+  totalPreachers: number;
   page: number;
   pages: number;
   data: ApiSermonSummary[];

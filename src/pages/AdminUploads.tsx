@@ -207,7 +207,7 @@ export default function AdminUploads() {
       />
 
       {/* Progress Steps */}
-      <div className="admin-card p-4">
+      <div className="bg-blue-900/10 backdrop-blur border-2 border-gray-700 p-4">
         <div className="flex items-center gap-0">
           {stepLabels.map((s, idx) => (
             <div key={s.key} className="flex items-center flex-1">
@@ -218,14 +218,14 @@ export default function AdminUploads() {
                       ? 'bg-emerald-500 border-emerald-500 text-white'
                       : idx === currentStepIdx
                       ? 'bg-indigo-600 border-indigo-600 text-white'
-                      : 'bg-gray-900 border-gray-800 text-gray-500'
+                      : 'bg-gray-400 border-gray-800 text-gray-900'
                   }`}
                 >
                   {idx < currentStepIdx ? <CheckCircle className="h-4 w-4" /> : idx + 1}
                 </div>
                 <span
                   className={`text-xs font-medium text-center leading-tight ${
-                    idx <= currentStepIdx ? 'text-gray-200' : 'text-gray-500'
+                    idx <= currentStepIdx ? 'text-gray-200' : 'text-gray-200'
                   }`}
                 >
                   {s.label}
@@ -234,7 +234,7 @@ export default function AdminUploads() {
               {idx < stepLabels.length - 1 && (
                 <div
                   className={`h-0.5 flex-1 mb-5 transition-colors ${
-                    idx < currentStepIdx ? 'bg-emerald-400' : 'bg-gray-800'
+                    idx < currentStepIdx ? 'bg-emerald-400' : 'bg-gray-500'
                   }`}
                 />
               )}
@@ -245,14 +245,14 @@ export default function AdminUploads() {
 
       {/* ── Step 1: Upload ─────────────────────────────────────────────────────── */}
       {step === 'upload' && (
-        <div className="admin-card p-6 space-y-4">
+        <div className="bg-blue-500/10 backdrop-blur border-2 border-gray-700 p-5 p-6 space-y-4">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-9 h-9 bg-indigo-500/10 border border-indigo-500/25 rounded-xl flex items-center justify-center">
               <Brain className="h-4 w-4 text-indigo-400" />
             </div>
             <div>
               <h3 className="text-sm font-semibold text-gray-100">Upload Sermon File</h3>
-              <p className="text-xs text-gray-400">Audio, video or document — AI will process it</p>
+              <p className="text-xs text-gray-400">Audio, video or document. AI will process it</p>
             </div>
           </div>
 
@@ -305,7 +305,7 @@ export default function AdminUploads() {
           )}
 
           {/* Format hints */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {/* <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div className="flex items-center gap-2 p-3 bg-gray-800/40 border border-gray-800 rounded-lg">
               <Music className="h-4 w-4 text-indigo-500 flex-shrink-0" />
               <div>
@@ -327,7 +327,7 @@ export default function AdminUploads() {
                 <p className="text-xs text-gray-500">PDF · DOC · DOCX</p>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <input
             ref={inputRef}
@@ -345,7 +345,7 @@ export default function AdminUploads() {
       {step === 'confirm' && selectedFile && (
         <div className="space-y-4">
           {/* File summary card */}
-          <div className="admin-card p-4">
+          <div className="bg-blue-500/10 backdrop-blur border-2 border-gray-700 p-4">
             <div className="flex items-center gap-3">
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center border ${
@@ -375,7 +375,7 @@ export default function AdminUploads() {
           </div>
 
           {/* Prompt card */}
-          <div className="admin-card p-5 space-y-4">
+          <div className="bg-blue-500/10 backdrop-blur border-2 border-gray-700 p-5 space-y-4">
             <div>
               <h3 className="text-sm font-semibold text-gray-100 mb-1">
                 Add Context for AI{' '}
@@ -431,7 +431,7 @@ export default function AdminUploads() {
       {/* ── Step 3: Processing ────────────────────────────────────────────────── */}
       {step === 'processing' && job && (
         <div className="space-y-4">
-          <div className="admin-card p-5 space-y-5">
+          <div className="bg-blue-500/10 backdrop-blur border-2 border-gray-700 p-5 space-y-5">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 bg-indigo-500/10 border border-indigo-500/25 rounded-xl flex items-center justify-center">
@@ -484,7 +484,7 @@ export default function AdminUploads() {
       {step === 'result' && job && (
         <div className="space-y-5">
           {/* Header */}
-          <div className="admin-card p-4 flex items-center justify-between">
+          <div className="bg-blue-500/10 backdrop-blur border-2 border-gray-700 p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 bg-emerald-500/10 border border-emerald-500/25 rounded-xl flex items-center justify-center">
                 <CheckCircle className="h-4 w-4 text-emerald-400" />
@@ -524,7 +524,7 @@ export default function AdminUploads() {
               <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide px-1 mb-3">
                 Publish Sermon
               </h3>
-              <div className="admin-card p-5">
+              <div className="bg-blue-500/10 backdrop-blur border-2 border-gray-700 p-5">
                 <AIResultEditor
                   job={job}
                   initialTitle={selectedTitle}

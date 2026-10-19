@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { BookOpen, Plus, ArrowRight, Calendar, Building2 } from 'lucide-react';
+import { BookOpen, Plus, ArrowRight, Calendar, Building2, Users, Newspaper, FolderUp } from 'lucide-react';
 import StatsCard from '../components/ui/StatsCard';
 import DataTable, { type Column } from '../components/ui/DataTable';
 import { useSermons } from '../hooks/useSermons';
@@ -13,6 +13,7 @@ export default function AdminDashboard() {
   const { churchFilter } = useChurch();
   const { currentUser } = useAuth();
   const canEditChurch = ROUTE_PERMISSIONS.churchProfile.includes(currentUser?.role ?? 'transcriptionist');
+  const canManageAnnouncements = ROUTE_PERMISSIONS.announcements.includes(currentUser?.role ?? 'transcriptionist');
 
   const { data: sermonData, isLoading: sermonsLoading } = useSermons({
     church: churchFilter,
@@ -24,9 +25,13 @@ export default function AdminDashboard() {
 
   const latestSermons = sermonData?.data ?? [];
   const totalSermons = sermonData?.total ?? 0;
+  const totalPreachers = sermonData?.totalPreachers ?? 0;
   // const totalChurches = churchesData?.total ?? 0;
 
-  const thisYear = new Date().getFullYear().toString();
+  const today = new Date();
+  const thisYear = today.getFullYear().toString();
+  const todayDate = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  const todayDay = today.toLocaleDateString('en-US', { weekday: 'long' });
 
   const columns: Column<ApiSermonSummary>[] = [
     {
@@ -64,19 +69,23 @@ export default function AdminDashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-100">Dashboard</h1>
-          <p className="text-sm text-gray-400 mt-0.5">{churchFilter}</p>
+          <p className="text-sm text-gray-400 mt-0.5">Welcome back!</p>
+          <h1 className="text-xl font-bold text-gray-100">{churchFilter}</h1>
           {/* MULTI-CHURCH: {churchFilter ? `Viewing: ${churchFilter}` : 'All Churches'} */}
         </div>
-        <Link to="/admin/sermons/new" className="btn-primary">
-          <Plus className="h-4 w-4" /> New Sermon
-        </Link>
+
+        {/* Current date and day */}
+        <div className="text-right">
+          <p className="text-sm font-semibold text-gray-100">{todayDate}</p>
+          <p className="text-xs text-gray-400 mt-0.5">{todayDay}</p>
+        </div>
       </div>
 
       {/* Stats */}
       {/* MULTI-CHURCH: super admins saw a third "Churches" stat (grid-cols-2 lg:grid-cols-3). */}
-      <div className="grid gap-4 grid-cols-2">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 xl:grid-cols-3">
         <StatsCard label="Total Sermons" value={totalSermons} icon={BookOpen} color="indigo" isLoading={sermonsLoading} />
+        <StatsCard label="Total Preachers" value={totalPreachers} icon={Users} color="sky" isLoading={sermonsLoading} />
         {/* MULTI-CHURCH:
         {isSuperAdmin && (
           <StatsCard label="Churches" value={totalChurches} icon={Building2} color="sky" isLoading={churchesLoading} />
@@ -92,27 +101,47 @@ export default function AdminDashboard() {
       </div>
 
       {/* Quick actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <Link to="/admin/sermons/new" className="admin-card p-4 flex items-center gap-4 hover:bg-gray-800/40 transition-colors group">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <Link to="/admin/sermons/new" className="bg-gray-800/10 backdrop-blur border border-gray-800 p-4 flex items-center gap-4 hover:bg-gray-800/40 transition-colors group">
           <div className="w-10 h-10 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center justify-center">
             <Plus className="h-5 w-5 text-indigo-400" />
           </div>
           <div className="flex-1">
             <p className="text-sm font-semibold text-gray-100">New Sermon</p>
-            <p className="text-xs text-gray-400">Add a sermon with transcript</p>
+          </div>
+          <ArrowRight className="h-4 w-4 text-gray-600 group-hover:text-gray-400 transition-colors" />
+        </Link>
+
+        {canManageAnnouncements && (
+          <Link to="/admin/announcements" className="bg-gray-800/10 backdrop-blur border border-gray-800 p-4 flex items-center gap-4 hover:bg-gray-800/40 transition-colors group">
+            <div className="w-10 h-10 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-center justify-center">
+              <Newspaper className="h-5 w-5 text-amber-400" />
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-gray-100">Announcements</p>
+            </div>
+            <ArrowRight className="h-4 w-4 text-gray-600 group-hover:text-gray-400 transition-colors" />
+          </Link>
+        )}
+
+        <Link to="/admin/uploads" className="bg-gray-800/10 backdrop-blur border border-gray-800 p-4 flex items-center gap-4 hover:bg-gray-800/40 transition-colors group">
+          <div className="w-10 h-10 bg-sky-500/10 border border-sky-500/20 rounded-xl flex items-center justify-center">
+            <FolderUp className="h-5 w-5 text-sky-400" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-gray-100">Uploads</p>
           </div>
           <ArrowRight className="h-4 w-4 text-gray-600 group-hover:text-gray-400 transition-colors" />
         </Link>
 
         {/* MULTI-CHURCH: super admins had "Manage Churches" → /admin/churches ("Register or update church info"). */}
         {canEditChurch && (
-          <Link to="/admin/church" className="admin-card p-4 flex items-center gap-4 hover:bg-gray-800/40 transition-colors group">
+          <Link to="/admin/church" className="bg-gray-800/10 backdrop-blur border border-gray-800 p-4 flex items-center gap-4 hover:bg-gray-800/40 transition-colors group">
             <div className="w-10 h-10 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center">
               <Building2 className="h-5 w-5 text-emerald-400" />
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-gray-100">Church Profile</p>
-              <p className="text-xs text-gray-400">Update the website's tagline, description and contact info</p>
             </div>
             <ArrowRight className="h-4 w-4 text-gray-600 group-hover:text-gray-400 transition-colors" />
           </Link>

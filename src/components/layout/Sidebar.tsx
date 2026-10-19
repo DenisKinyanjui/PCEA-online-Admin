@@ -35,9 +35,9 @@ const groups: NavGroup[] = [
     label: 'Content',
     items: [
       { to: '/admin/sermons', label: 'Sermons', icon: BookOpenText },
+      { to: '/admin/uploads', label: 'Upload Sermon', icon: FolderUp },
       { to: '/admin/youth-messages', label: 'Message to the Youth', icon: Sprout, roles: ROUTE_PERMISSIONS.youthMessages },
       { to: '/admin/announcements', label: 'Announcements', icon: Newspaper, roles: ROUTE_PERMISSIONS.announcements },
-      { to: '/admin/uploads', label: 'Uploads', icon: FolderUp },
     ],
   },
   {
@@ -69,10 +69,10 @@ function NavItem({ to, label, icon: Icon, end, onClose }: NavItemDef & { onClose
       end={end}
       onClick={onClose}
       className={({ isActive }) =>
-        `group relative flex items-center gap-2.5 h-9 px-2.5 rounded-md text-[13px] transition-colors
-        focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/40 ${
+        `group relative flex items-center gap-3 h-11 px-3 rounded-lg text-sm transition-colors
+        focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 ${
           isActive
-            ? 'bg-gray-800/70 text-gray-100 font-medium'
+            ? 'bg-blue-700/50 text-white font-medium'
             : 'text-gray-400 hover:text-gray-100 hover:bg-gray-800/40'
         }`
       }
@@ -80,14 +80,14 @@ function NavItem({ to, label, icon: Icon, end, onClose }: NavItemDef & { onClose
       {({ isActive }) => (
         <>
           <span
-            className={`absolute -left-3 top-2 bottom-2 w-[3px] rounded-r bg-indigo-500 transition-opacity ${
+            className={`absolute -left-3 top-2.5 bottom-2.5 w-[3px] rounded-r bg-blue-500 transition-opacity ${
               isActive ? 'opacity-100' : 'opacity-0'
             }`}
           />
           <Icon
-            size={17}
+            size={19}
             strokeWidth={isActive ? 2 : 1.75}
-            className={`flex-shrink-0 ${isActive ? 'text-indigo-400' : 'text-gray-500 group-hover:text-gray-400'}`}
+            className={`flex-shrink-0 ${isActive ? 'text-white' : 'text-gray-500 group-hover:text-gray-400'}`}
           />
           <span className="truncate">{label}</span>
         </>
@@ -111,17 +111,18 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-[1px] z-40 lg:hidden" onClick={onClose} />
       )}
 
-      <aside className={`fixed top-0 left-0 h-full w-64 bg-gray-950 border-r border-gray-800
+      <aside className={`fixed top-0 left-0 h-full w-64 bg-gray-950/80 border-r border-gray-800
         z-50 flex flex-col transition-transform duration-200 ease-out
         ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:z-auto`}
       >
         {/* Brand */}
         <div className="flex items-center gap-3 px-4 h-16 flex-shrink-0">
-          <img src="/images/PCEALogo.png" alt="PCEA" className="w-8 h-8 flex-shrink-0 object-contain" />
+          <img src="/images/PCEALogo.webp" alt="PCEA" className="w-8 h-8 flex-shrink-0 object-contain" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-semibold text-gray-100 leading-tight">PCEA Admin</p>
-            <p className="text-xs text-gray-500 truncate leading-tight mt-0.5">{churchFilter}</p>
+            <p className="text-sm font-semibold text-gray-100 leading-tight">PCEA</p>
+            <p className="text-xs text-gray-500 truncate leading-tight mt-0.5">Emmanuel Thome Church</p>
+            {/* <p className="text-xs text-gray-500 truncate leading-tight mt-0.5">{churchFilter}</p> */}
           </div>
           <button
             onClick={onClose}
@@ -137,9 +138,9 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           {visibleGroups.map((group, i) => (
             <div key={group.label ?? i} className={i > 0 ? 'mt-6' : ''}>
               {group.label && (
-                <p className="px-2.5 mb-1.5 text-[11px] font-medium text-gray-500">{group.label}</p>
+                <p className="px-3 mb-2 text-[11px] font-medium text-gray-500">{group.label}</p>
               )}
-              <ul className="space-y-px">
+              <ul className="space-y-1">
                 {group.items.map((item) => (
                   <li key={item.to}>
                     <NavItem {...item} onClose={onClose} />

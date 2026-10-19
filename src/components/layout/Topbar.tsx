@@ -39,7 +39,7 @@ export default function Topbar({ onMenuToggle, title }: TopbarProps) {
   };
 
   return (
-    <header className="h-16 bg-gray-950/80 backdrop-blur border-b border-gray-800 flex items-center justify-between
+    <header className="h-16 bg-blue-900/10 backdrop-blur border-b border-gray-800 flex items-center justify-between
       px-4 lg:px-6 flex-shrink-0 sticky top-0 z-30">
 
       <div className="flex items-center gap-3">

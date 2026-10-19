@@ -33,7 +33,7 @@ export default function AdminLayout() {
 
   return (
     <ChurchProvider>
-      <div className="flex h-screen bg-gray-950 overflow-hidden">
+      <div className="flex h-screen bg-blue-950/40 overflow-hidden">
         <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           <Topbar onMenuToggle={() => setSidebarOpen(true)} title={title} />

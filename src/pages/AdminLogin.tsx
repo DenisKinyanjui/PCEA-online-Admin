@@ -30,23 +30,12 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center">
-            <img
-              src="/images/PCEALogo.webp" 
-              alt="PCEA Online Ministry Logo" 
-              className="w-12 h-18" />
-
-          </div>
-          <h1 className="text-2xl font-bold text-gray-100">Admin Portal</h1>
-          <p className="text-gray-400 text-sm mt-1">PCEA Emmanuel Thome Church</p>
-        </div>
+       
 
         {/* Card */}
-        <div className="admin-card p-8">
+        <div className="bg-blue-900/10 border-2 border-white/80 rounded-md p-6 shadow-lg shadow-gray-700 p-8">
           <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
               <div className="bg-red-500/10 border border-red-500/25 rounded-lg px-4 py-3 text-sm text-red-400">
@@ -54,15 +43,30 @@ export default function AdminLogin() {
               </div>
             )}
 
+             {/* Logo */}
+        <div className="text-center">
+          <div className="inline-flex items-center justify-center">
+            <img
+              src="/images/PCEALogo.webp" 
+              alt="PCEA Online Ministry Logo" 
+              className="w-12 h-18" />
+
+          </div>
+          <h1 className="text-xl font-bold text-gray-100">PCEA Emmanuel Thome</h1>
+          <p className="text-gray-400 text-sm mt-1">Admin Panel</p>
+        </div>
+
+            <hr className="border-0 border-t border-gray-600 w-[calc(100%+4rem)] -ml-8 my-6" />
+
             <div>
-              <label className="admin-label">Email address</label>
+              <label className="admin-label">Email</label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-500" />
                 <input
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@pceaonlineministry.com"
+                  placeholder="example@gmail.com"
                   className="admin-input pl-10"
                   autoComplete="email"
                 />
@@ -91,20 +95,17 @@ export default function AdminLogin() {
               </div>
             </div>
 
-            <button type="submit" disabled={isLoading} className="btn-primary w-full justify-center py-2.5">
+            <button type="submit" disabled={isLoading} className="bg-gray-100 w-full text-gray-700 rounded-sm font-medium justify-center py-2.5">
               {isLoading ? (
                 <>
                   <span className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
-                  Signing in…
+                  Authenticating…
                 </>
               ) : 'Sign in'}
             </button>
           </form>
         </div>
 
-        <p className="text-center text-xs text-gray-500 mt-6">
-          PCEA Online Ministry — Admin Panel
-        </p>
       </div>
     </div>
   );

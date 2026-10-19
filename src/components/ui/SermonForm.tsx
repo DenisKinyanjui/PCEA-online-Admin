@@ -121,7 +121,7 @@ export default function SermonForm({ initialData, /* churches, */ onSubmit, isSu
   };
 
   const Section = ({ id, label, children }: { id: 'media' | 'content'; label: string; children: React.ReactNode }) => (
-    <div className="admin-card overflow-hidden">
+    <div className="bg-blue-900/10 backdrop-blur border-2 border-gray-700 p-5  overflow-hidden">
       <button
         type="button"
         onClick={() => setOpenSection(openSection === id ? null : id)}
@@ -137,7 +137,7 @@ export default function SermonForm({ initialData, /* churches, */ onSubmit, isSu
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {/* Core fields */}
-      <div className="admin-card p-5 space-y-5">
+      <div className="bg-blue-900/10 backdrop-blur border-2 border-gray-700 p-5 space-y-5">
         <h2 className="text-sm font-semibold text-gray-100">Basic Information</h2>
 
         <div>

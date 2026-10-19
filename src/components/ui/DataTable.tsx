@@ -19,11 +19,11 @@ export default function DataTable<T>({
   columns, data, keyExtractor, isLoading, skeletonRows = 5,
 }: DataTableProps<T>) {
   return (
-    <div className="admin-card overflow-hidden">
+    <div className="bg-blue-900/10 backdrop-blur border border-gray-800 p-5 overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-gray-800/40 border-b border-gray-800">
+            <tr className="bg-blue-800/20 border-b border-gray-800">
               {columns.map((col) => (
                 <th
                   key={col.key}
