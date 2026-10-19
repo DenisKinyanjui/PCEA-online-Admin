@@ -4,7 +4,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { useChurch } from '../../context/ChurchContext';
+// import { useChurch } from '../../context/ChurchContext';
 import { ROUTE_PERMISSIONS } from '../../config/roles';
 
 interface SidebarProps {
