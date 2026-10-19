@@ -98,7 +98,7 @@ function NavItem({ to, label, icon: Icon, end, onClose }: NavItemDef & { onClose
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
   const { currentUser } = useAuth();
-  const { churchFilter } = useChurch();
+  // const { churchFilter } = useChurch();
   const role = currentUser?.role ?? '';
 
   const visibleGroups = groups
