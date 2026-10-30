@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { fetchSermons, fetchSermon, fetchSermonMeta } from '../api/sermonApi';
+import { fetchSermons, fetchSermon, fetchSermonMeta, fetchPreacherProfiles } from '../api/sermonApi';
 import type { SermonFilters } from '../types';
 
 export function useSermons(filters: SermonFilters = {}) {
@@ -25,5 +25,13 @@ export function useSermonMeta() {
     queryKey: ['admin-sermon-meta'],
     queryFn: fetchSermonMeta,
     staleTime: 1000 * 60 * 10,
+  });
+}
+
+export function usePreacherProfiles() {
+  return useQuery({
+    queryKey: ['admin-preacher-profiles'],
+    queryFn: fetchPreacherProfiles,
+    staleTime: 1000 * 60 * 5,
   });
 }

@@ -15,9 +15,11 @@ const titles: Record<string, string> = {
   '/admin/announcements': 'Announcements',
   '/admin/announcements/new': 'New Announcement',
   '/admin/youth-messages': 'Message to the Youth',
+  '/admin/quiz': 'Bible Quiz',
   '/admin/youth-messages/new': 'New Message to the Youth',
   '/admin/users': 'Users',
   '/admin/uploads': 'Uploads',
+  '/admin/content': 'Content',
   '/admin/profile': 'Profile',
 };
 

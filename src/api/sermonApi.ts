@@ -4,6 +4,7 @@ import type {
   SermonsResponse,
   SermonFilters,
   SermonMetaData,
+  PreacherProfile,
   CreateSermonInput,
 } from '../types';
 
@@ -26,6 +27,13 @@ export async function fetchSermon(id: string): Promise<ApiSermon> {
 
 export async function fetchSermonMeta(): Promise<SermonMetaData> {
   const { data } = await axiosInstance.get<{ success: boolean; data: SermonMetaData }>('/sermons/meta');
+  return data.data;
+}
+
+export async function fetchPreacherProfiles(): Promise<PreacherProfile[]> {
+  const { data } = await axiosInstance.get<{ success: boolean; data: PreacherProfile[] }>(
+    '/sermons/preacher-profiles',
+  );
   return data.data;
 }
 

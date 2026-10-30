@@ -4,7 +4,9 @@ import type { SermonJob, CreateSermonFromAIInput } from '../../../types';
 import { createSermonFromAI } from '../../../api/uploadApi';
 import { useToast } from '../../../context/ToastContext';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from '@tanstack/react-query';
 import TagInput from '../../ui/TagInput';
+import PreacherSelector from '../../ui/PreacherSelector';
 
 interface AIResultEditorProps {
   job: SermonJob;
@@ -15,9 +17,11 @@ interface AIResultEditorProps {
 export default function AIResultEditor({ job, initialTitle, church }: AIResultEditorProps) {
   const toast = useToast();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const [title, setTitle] = useState(initialTitle || job.aiResult.titleSuggestions[0] || '');
   const [preacher, setPreacher] = useState('');
+  const [preacherPhotoUrl, setPreacherPhotoUrl] = useState('');
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [summary, setSummary] = useState(job.aiResult.summary || '');
   const [scriptureRefs, setScriptureRefs] = useState<string[]>(job.aiResult.keyVerses || []);
@@ -36,6 +40,7 @@ export default function AIResultEditor({ job, initialTitle, church }: AIResultEd
         jobId: job._id,
         title: title.trim(),
         preacher: preacher.trim(),
+        preacherPhotoUrl: preacherPhotoUrl || undefined,
         date,
         summary: summary.trim(),
         scriptureReferences: scriptureRefs,
@@ -43,6 +48,7 @@ export default function AIResultEditor({ job, initialTitle, church }: AIResultEd
         audioUrl: job.sourceFileType === 'audio' ? job.sourceFileUrl : undefined,
       };
       await createSermonFromAI(input);
+      await queryClient.invalidateQueries({ queryKey: ['admin-preacher-profiles'] });
       toast('Sermon published successfully!', 'success');
       navigate('/sermons');
     } catch (err: unknown) {
@@ -70,16 +76,12 @@ export default function AIResultEditor({ job, initialTitle, church }: AIResultEd
         </div>
 
         {/* Preacher */}
-        <div>
-          <label className="admin-label">Preacher *</label>
-          <input
-            type="text"
-            value={preacher}
-            onChange={(e) => setPreacher(e.target.value)}
-            className="admin-input w-full"
-            placeholder="e.g. Rev. John Kamau"
-          />
-        </div>
+        <PreacherSelector
+          preacher={preacher}
+          photoUrl={preacherPhotoUrl}
+          onPreacherChange={setPreacher}
+          onPhotoChange={setPreacherPhotoUrl}
+        />
 
         {/* Date */}
         <div>

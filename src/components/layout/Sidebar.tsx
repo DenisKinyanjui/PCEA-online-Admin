@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import {
-  Gauge, BookOpenText, Sprout, Newspaper, FolderUp, Church, UsersRound, X,
+  Gauge, BookOpenText, Sprout, Newspaper, FolderUp, Church, UsersRound, X, PanelsTopLeft, Brain,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -37,7 +37,9 @@ const groups: NavGroup[] = [
       { to: '/admin/sermons', label: 'Sermons', icon: BookOpenText },
       { to: '/admin/uploads', label: 'Upload Sermon', icon: FolderUp },
       { to: '/admin/youth-messages', label: 'Message to the Youth', icon: Sprout, roles: ROUTE_PERMISSIONS.youthMessages },
+      { to: '/admin/quiz', label: 'Bible Quiz', icon: Brain, roles: ROUTE_PERMISSIONS.quiz },
       { to: '/admin/announcements', label: 'Announcements', icon: Newspaper, roles: ROUTE_PERMISSIONS.announcements },
+      { to: '/admin/content', label: 'Content', icon: PanelsTopLeft, roles: ROUTE_PERMISSIONS.content },
     ],
   },
   {
@@ -46,6 +48,8 @@ const groups: NavGroup[] = [
       // MULTI-CHURCH: { to: '/admin/churches', label: 'Churches', icon: Church, roles: ROUTE_PERMISSIONS.churches },
       { to: '/admin/church', label: 'Church Profile', icon: Church, roles: ROUTE_PERMISSIONS.churchProfile },
       { to: '/admin/users', label: 'Users', icon: UsersRound, roles: ROUTE_PERMISSIONS.users },
+      { to: '/admin/members', label: 'Members', icon: UsersRound, roles: ROUTE_PERMISSIONS.members },
+      { to: '/admin/districts', label: 'Districts', icon: Church, roles: ROUTE_PERMISSIONS.districts },
     ],
   },
 ];

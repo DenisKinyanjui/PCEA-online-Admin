@@ -6,7 +6,10 @@ export function useCreateSermon() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (payload: CreateSermonInput) => createSermon(payload),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-sermons'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-sermons'] });
+      qc.invalidateQueries({ queryKey: ['admin-preacher-profiles'] });
+    },
   });
 }
 
@@ -17,6 +20,7 @@ export function useUpdateSermon(id: string) {
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['admin-sermons'] });
       qc.invalidateQueries({ queryKey: ['admin-sermon', id] });
+      qc.invalidateQueries({ queryKey: ['admin-preacher-profiles'] });
     },
   });
 }
@@ -25,6 +29,9 @@ export function useDeleteSermon() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (id: string) => deleteSermon(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['admin-sermons'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['admin-sermons'] });
+      qc.invalidateQueries({ queryKey: ['admin-preacher-profiles'] });
+    },
   });
 }

@@ -113,6 +113,8 @@ export interface ApiSermon {
   _id: string;
   title: string;
   preacher: string;
+  preacherPhotoUrl?: string;
+  preacherPhotoPath?: string | null;
   church: string;
   date: string;
   scriptureReferences: string[];
@@ -129,6 +131,8 @@ export interface ApiSermonSummary {
   _id: string;
   title: string;
   preacher: string;
+  preacherPhotoUrl?: string;
+  preacherPhotoPath?: string | null;
   church: string;
   date: string;
   scriptureReferences: string[];
@@ -162,9 +166,16 @@ export interface SermonMetaData {
   churches: string[];
 }
 
+export interface PreacherProfile {
+  preacher: string;
+  preacherPhotoUrl: string;
+  preacherPhotoPath: string | null;
+}
+
 export interface CreateSermonInput {
   title: string;
   preacher: string;
+  preacherPhotoUrl?: string;
   date: string;
   scriptureReferences?: string[];
   summary?: string;
@@ -188,6 +199,11 @@ export interface UploadAttachmentResponse {
   filename: string;
   originalName: string;
   fileType: string;
+}
+
+export interface UploadPreacherPhotoResponse {
+  success: boolean;
+  url: string;
 }
 
 // ─── AI Sermon Pipeline ──────────────────────────────────────────────────────
@@ -261,6 +277,7 @@ export interface CreateSermonFromAIInput {
   jobId: string;
   title: string;
   preacher: string;
+  preacherPhotoUrl?: string;
   date: string;
   scriptureReferences?: string[];
   summary?: string;

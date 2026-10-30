@@ -22,8 +22,12 @@ import AdminAnnouncementForm from './pages/AdminAnnouncementForm';
 import AdminYouthMessages from './pages/AdminYouthMessages';
 import AdminYouthMessageForm from './pages/AdminYouthMessageForm';
 import AdminUsers from './pages/AdminUsers';
+import AdminMembers from './pages/AdminMembers';
+import AdminDistricts from './pages/AdminDistricts';
 import AdminUploads from './pages/AdminUploads';
 import AdminProfile from './pages/AdminProfile';
+import AdminContent from './pages/AdminContent';
+import AdminQuiz from './pages/AdminQuiz';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, refetchOnWindowFocus: false } },
@@ -48,7 +52,11 @@ export default function App() {
                 }
               >
                 {/* Accessible to all authenticated roles */}
-                <Route index element={<AdminDashboard />} />
+                <Route index element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.dashboard}>
+                    <AdminDashboard />
+                  </RoleGuard>
+                } />
                 <Route path="403" element={<Admin403 />} />
 
                 <Route path="sermons" element={
@@ -74,6 +82,16 @@ export default function App() {
                 <Route path="profile" element={
                   <RoleGuard allowedRoles={ROUTE_PERMISSIONS.profile}>
                     <AdminProfile />
+                  </RoleGuard>
+                } />
+                <Route path="content" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.content}>
+                    <AdminContent />
+                  </RoleGuard>
+                } />
+                <Route path="quiz" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.quiz}>
+                    <AdminQuiz />
                   </RoleGuard>
                 } />
 
@@ -140,6 +158,16 @@ export default function App() {
                 <Route path="users" element={
                   <RoleGuard allowedRoles={ROUTE_PERMISSIONS.users}>
                     <AdminUsers />
+                  </RoleGuard>
+                } />
+                <Route path="members" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.members}>
+                    <AdminMembers />
+                  </RoleGuard>
+                } />
+                <Route path="districts" element={
+                  <RoleGuard allowedRoles={ROUTE_PERMISSIONS.districts}>
+                    <AdminDistricts />
                   </RoleGuard>
                 } />
               </Route>

@@ -2,6 +2,7 @@ import axiosInstance from './axiosInstance';
 import type {
   UploadAudioResponse,
   UploadAttachmentResponse,
+  UploadPreacherPhotoResponse,
   AIUploadResponse,
   AIProcessResponse,
   AIStatusResponse,
@@ -35,6 +36,15 @@ export async function uploadAttachment(
     onUploadProgress: (e) => {
       if (onProgress && e.total) onProgress(Math.round((e.loaded / e.total) * 100));
     },
+  });
+  return data;
+}
+
+export async function uploadPreacherPhoto(file: File): Promise<UploadPreacherPhotoResponse> {
+  const form = new FormData();
+  form.append('photo', file);
+  const { data } = await axiosInstance.post<UploadPreacherPhotoResponse>('/uploads/preacher-photo', form, {
+    headers: { 'Content-Type': 'multipart/form-data' },
   });
   return data;
 }

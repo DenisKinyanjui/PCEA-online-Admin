@@ -1,7 +1,8 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactNode } from 'react';
 import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import TagInput from './TagInput';
 import UploadField from './UploadField';
+import PreacherSelector from './PreacherSelector';
 import { useChurch } from '../../context/ChurchContext';
 import type { ApiSermon, CreateSermonInput, ApiChurch } from '../../types';
 
@@ -14,6 +15,7 @@ interface PointState {
 interface FormState {
   title: string;
   preacher: string;
+  preacherPhotoUrl: string;
   date: string;
   church: string;
   scriptureReferences: string[];
@@ -39,10 +41,21 @@ function emptyPoint(): PointState {
   return { title: '', description: '', verses: [] };
 }
 
+function formatDateForInput(date: string | Date | undefined): string {
+  if (!date) return '';
+  if (typeof date === 'string') {
+    const dateOnly = date.match(/^\d{4}-\d{2}-\d{2}/)?.[0];
+    if (dateOnly) return dateOnly;
+  }
+
+  const parsedDate = date instanceof Date ? date : new Date(date);
+  return Number.isNaN(parsedDate.getTime()) ? '' : parsedDate.toISOString().slice(0, 10);
+}
+
 function toFormState(sermon: ApiSermon | undefined, defaultChurch: string): FormState {
   if (!sermon) {
     return {
-      title: '', preacher: '', date: '', church: defaultChurch,
+      title: '', preacher: '', preacherPhotoUrl: '', date: '', church: defaultChurch,
       scriptureReferences: [], summary: '', audioUrl: '', videoType: '', videoUrl: '',
       introduction: '', points: [emptyPoint()], conclusion: '',
     };
@@ -50,7 +63,8 @@ function toFormState(sermon: ApiSermon | undefined, defaultChurch: string): Form
   return {
     title: sermon.title,
     preacher: sermon.preacher,
-    date: sermon.date.slice(0, 10),
+    preacherPhotoUrl: sermon.preacherPhotoUrl ?? '',
+    date: formatDateForInput(sermon.date),
     church: sermon.church ?? defaultChurch,
     scriptureReferences: sermon.scriptureReferences ?? [],
     summary: sermon.summary ?? '',
@@ -63,6 +77,34 @@ function toFormState(sermon: ApiSermon | undefined, defaultChurch: string): Form
       : [emptyPoint()],
     conclusion: sermon.content?.conclusion ?? '',
   };
+}
+
+function FormSection({
+  id,
+  label,
+  isOpen,
+  onToggle,
+  children,
+}: {
+  id: 'media' | 'content';
+  label: string;
+  isOpen: boolean;
+  onToggle: (id: 'media' | 'content') => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="bg-blue-900/10 backdrop-blur border-2 border-gray-700 p-5 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => onToggle(id)}
+        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-800/40 transition-colors"
+      >
+        <span className="text-sm font-semibold text-gray-100">{label}</span>
+        {isOpen ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
+      </button>
+      {isOpen && <div className="px-5 pb-6 border-t border-gray-800 pt-5">{children}</div>}
+    </div>
+  );
 }
 
 export default function SermonForm({ initialData, /* churches, */ onSubmit, isSubmitting, submitLabel = 'Save Sermon' }: SermonFormProps) {
@@ -102,6 +144,7 @@ export default function SermonForm({ initialData, /* churches, */ onSubmit, isSu
     await onSubmit({
       title: form.title.trim(),
       preacher: form.preacher.trim(),
+      preacherPhotoUrl: form.preacherPhotoUrl,
       date: form.date,
       church: form.church || undefined,
       scriptureReferences: form.scriptureReferences,
@@ -119,20 +162,6 @@ export default function SermonForm({ initialData, /* churches, */ onSubmit, isSu
       },
     });
   };
-
-  const Section = ({ id, label, children }: { id: 'media' | 'content'; label: string; children: React.ReactNode }) => (
-    <div className="bg-blue-900/10 backdrop-blur border-2 border-gray-700 p-5  overflow-hidden">
-      <button
-        type="button"
-        onClick={() => setOpenSection(openSection === id ? null : id)}
-        className="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-gray-800/40 transition-colors"
-      >
-        <span className="text-sm font-semibold text-gray-100">{label}</span>
-        {openSection === id ? <ChevronUp className="h-4 w-4 text-gray-500" /> : <ChevronDown className="h-4 w-4 text-gray-500" />}
-      </button>
-      {openSection === id && <div className="px-5 pb-6 border-t border-gray-800 pt-5">{children}</div>}
-    </div>
-  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -153,12 +182,14 @@ export default function SermonForm({ initialData, /* churches, */ onSubmit, isSu
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="admin-label">Preacher <span className="text-red-400">*</span></label>
-            <input
-              value={form.preacher}
-              onChange={(e) => set('preacher', e.target.value)}
-              placeholder="e.g. Rev. James Kariuki"
-              className={`admin-input ${errors.preacher ? 'border-red-400' : ''}`}
+            <PreacherSelector
+              preacher={form.preacher}
+              photoUrl={form.preacherPhotoUrl}
+              fallbackPhotoPreviewUrl={initialData?.preacherPhotoPath
+                ? `${import.meta.env.VITE_API_URL}${initialData.preacherPhotoPath}`
+                : undefined}
+              onPreacherChange={(preacher) => set('preacher', preacher)}
+              onPhotoChange={(photoUrl) => set('preacherPhotoUrl', photoUrl)}
             />
             {errors.preacher && <p className="text-xs text-red-400 mt-1">{errors.preacher}</p>}
           </div>
@@ -232,7 +263,12 @@ export default function SermonForm({ initialData, /* churches, */ onSubmit, isSu
       </div>
 
       {/* Media */}
-      <Section id="media" label="Media (Audio &amp; Video)">
+      <FormSection
+        id="media"
+        label="Media (Audio &amp; Video)"
+        isOpen={openSection === 'media'}
+        onToggle={(id) => setOpenSection(openSection === id ? null : id)}
+      >
         <div className="space-y-5">
           <div>
             <label className="admin-label">Audio URL</label>
@@ -275,10 +311,15 @@ export default function SermonForm({ initialData, /* churches, */ onSubmit, isSu
             )}
           </div>
         </div>
-      </Section>
+      </FormSection>
 
       {/* Transcript */}
-      <Section id="content" label="Transcript / Sermon Content">
+      <FormSection
+        id="content"
+        label="Transcript / Sermon Content"
+        isOpen={openSection === 'content'}
+        onToggle={(id) => setOpenSection(openSection === id ? null : id)}
+      >
         <div className="space-y-6">
           <div>
             <label className="admin-label">Introduction</label>
@@ -319,7 +360,7 @@ export default function SermonForm({ initialData, /* churches, */ onSubmit, isSu
             <textarea value={form.conclusion} onChange={(e) => set('conclusion', e.target.value)} placeholder="Closing paragraph…" className="admin-textarea" rows={4} />
           </div>
         </div>
-      </Section>
+      </FormSection>
 
       <div className="flex justify-end gap-3 pt-2">
         <button type="submit" disabled={isSubmitting} className="btn-primary px-6">
