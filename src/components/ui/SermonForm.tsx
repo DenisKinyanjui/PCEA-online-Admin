@@ -3,6 +3,7 @@ import { Plus, Trash2, ChevronDown, ChevronUp } from 'lucide-react';
 import TagInput from './TagInput';
 import UploadField from './UploadField';
 import PreacherSelector from './PreacherSelector';
+import RichTextEditor from './RichTextEditor';
 import { useChurch } from '../../context/ChurchContext';
 import type { ApiSermon, CreateSermonInput, ApiChurch } from '../../types';
 
@@ -117,14 +118,23 @@ export default function SermonForm({ initialData, /* churches, */ onSubmit, isSu
   const [form, setForm] = useState<FormState>(() => toFormState(initialData, defaultChurch));
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [openSection, setOpenSection] = useState<'media' | 'content' | null>('content');
+  const [activeContentTab, setActiveContentTab] = useState<'introduction' | 'points' | 'conclusion'>('introduction');
+  const [activePoint, setActivePoint] = useState(0);
 
   const set = (field: keyof FormState, value: unknown) => {
     setForm((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: undefined }));
   };
 
-  const addPoint = () => set('points', [...form.points, emptyPoint()]);
-  const removePoint = (i: number) => set('points', form.points.filter((_, idx) => idx !== i));
+  const addPoint = () => {
+    set('points', [...form.points, emptyPoint()]);
+    setActivePoint(form.points.length);
+  };
+  const removePoint = (i: number) => {
+    const nextPoints = form.points.filter((_, idx) => idx !== i);
+    set('points', nextPoints);
+    setActivePoint(Math.max(0, Math.min(i, nextPoints.length - 1)));
+  };
   const updatePoint = (i: number, field: keyof PointState, value: string | string[]) =>
     set('points', form.points.map((p, idx) => idx === i ? { ...p, [field]: value } : p));
 
@@ -320,44 +330,98 @@ export default function SermonForm({ initialData, /* churches, */ onSubmit, isSu
         isOpen={openSection === 'content'}
         onToggle={(id) => setOpenSection(openSection === id ? null : id)}
       >
-        <div className="space-y-6">
-          <div>
-            <label className="admin-label">Introduction</label>
-            <textarea value={form.introduction} onChange={(e) => set('introduction', e.target.value)} placeholder="Opening paragraph…" className="admin-textarea" rows={4} />
+        <div className="space-y-4">
+          <div className="sermon-content-tabs" role="tablist" aria-label="Sermon content sections">
+            {([
+              ['introduction', 'Introduction'],
+              ['points', 'Main Points'],
+              ['conclusion', 'Conclusion'],
+            ] as const).map(([tab, label]) => (
+              <button
+                key={tab}
+                type="button"
+                role="tab"
+                id={`sermon-tab-${tab}`}
+                aria-selected={activeContentTab === tab}
+                aria-controls="sermon-content-panel"
+                className={`sermon-content-tab${activeContentTab === tab ? ' sermon-content-tab-active' : ''}`}
+                onClick={() => setActiveContentTab(tab)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <label className="admin-label mb-0">Main Points</label>
-              <button type="button" onClick={addPoint} className="btn-secondary text-xs py-1.5 px-3">
-                <Plus className="h-3.5 w-3.5" /> Add Point
-              </button>
-            </div>
-            <div className="space-y-4">
-              {form.points.map((point, i) => (
-                <div key={i} className="bg-gray-800/40 border border-gray-800 rounded-xl p-4 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Point {i + 1}</span>
+          <div id="sermon-content-panel" role="tabpanel" aria-labelledby={`sermon-tab-${activeContentTab}`}>
+            {activeContentTab === 'introduction' && (
+              <RichTextEditor
+                key="introduction"
+                value={form.introduction}
+                onChange={(value) => set('introduction', value)}
+                placeholder="Write the sermon introduction…"
+              />
+            )}
+
+            {activeContentTab === 'points' && form.points[activePoint] && (
+              <div className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div className="flex flex-wrap gap-2" role="tablist" aria-label="Main points">
+                    {form.points.map((point, index) => (
+                      <button
+                        key={index}
+                        type="button"
+                        role="tab"
+                        aria-selected={activePoint === index}
+                        className={`sermon-point-tab${activePoint === index ? ' sermon-point-tab-active' : ''}`}
+                        onClick={() => setActivePoint(index)}
+                      >
+                        {point.title.trim() || `Point ${index + 1}`}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <button type="button" onClick={addPoint} className="btn-secondary text-xs py-1.5 px-3">
+                      <Plus className="h-3.5 w-3.5" /> Add Point
+                    </button>
                     {form.points.length > 1 && (
-                      <button type="button" onClick={() => removePoint(i)} className="btn-danger text-xs py-1 px-2">
+                      <button type="button" onClick={() => removePoint(activePoint)} className="btn-danger text-xs py-1 px-2" aria-label="Remove current point">
                         <Trash2 className="h-3 w-3" />
                       </button>
                     )}
                   </div>
-                  <input value={point.title} onChange={(e) => updatePoint(i, 'title', e.target.value)} placeholder="Point title…" className="admin-input" />
-                  <textarea value={point.description} onChange={(e) => updatePoint(i, 'description', e.target.value)} placeholder="Point description…" className="admin-textarea" rows={3} />
-                  <div>
-                    <label className="text-xs text-gray-400 mb-1.5 block">Key Verses</label>
-                    <TagInput tags={point.verses} onChange={(tags) => updatePoint(i, 'verses', tags)} placeholder="Add verse (e.g. Romans 8:28), press Enter…" />
-                  </div>
                 </div>
-              ))}
-            </div>
-          </div>
+                <input
+                  value={form.points[activePoint].title}
+                  onChange={(e) => updatePoint(activePoint, 'title', e.target.value)}
+                  placeholder="Main point title…"
+                  aria-label="Main point title"
+                  className="admin-input"
+                />
+                <RichTextEditor
+                  key={`point-${activePoint}`}
+                  value={form.points[activePoint].description}
+                  onChange={(value) => updatePoint(activePoint, 'description', value)}
+                  placeholder="Write this main point…"
+                />
+                <div>
+                  <label className="text-xs text-gray-400 mb-1.5 block">Key Verses</label>
+                  <TagInput
+                    tags={form.points[activePoint].verses}
+                    onChange={(tags) => updatePoint(activePoint, 'verses', tags)}
+                    placeholder="Add verse (e.g. Romans 8:28), press Enter…"
+                  />
+                </div>
+              </div>
+            )}
 
-          <div>
-            <label className="admin-label">Conclusion</label>
-            <textarea value={form.conclusion} onChange={(e) => set('conclusion', e.target.value)} placeholder="Closing paragraph…" className="admin-textarea" rows={4} />
+            {activeContentTab === 'conclusion' && (
+              <RichTextEditor
+                key="conclusion"
+                value={form.conclusion}
+                onChange={(value) => set('conclusion', value)}
+                placeholder="Write the sermon conclusion…"
+              />
+            )}
           </div>
         </div>
       </FormSection>

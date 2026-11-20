@@ -55,6 +55,72 @@ input:-webkit-autofill:focus {
       focus:ring-indigo-500/20 transition-colors resize-y shadow-sm;
     min-height: 96px;
   }
+  .sermon-editor {
+    @apply overflow-hidden rounded-lg border border-gray-700 bg-gray-950/60;
+  }
+  .sermon-editor-toolbar {
+    @apply flex flex-wrap items-center gap-1 border-b border-gray-700 bg-gray-900/80 p-2;
+  }
+  .sermon-editor-button {
+    @apply inline-flex h-8 min-w-8 items-center justify-center rounded px-2 text-gray-300
+      hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500;
+  }
+  .sermon-editor-button-active {
+    @apply bg-indigo-600/30 text-indigo-200;
+  }
+  .sermon-editor-divider {
+    @apply mx-1 h-5 w-px bg-gray-700;
+  }
+  .sermon-editor-select {
+    @apply h-8 rounded border border-gray-700 bg-gray-950 px-2 text-xs text-gray-200
+      focus:outline-none focus:border-indigo-500;
+    max-width: 130px;
+  }
+  .sermon-editor-size {
+    max-width: 72px;
+  }
+  .sermon-editor-color {
+    @apply relative inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded
+      text-sm font-bold text-gray-200 hover:bg-gray-700;
+  }
+  .sermon-editor-color input {
+    @apply absolute inset-0 h-full w-full cursor-pointer opacity-0;
+  }
+  .sermon-highlight-icon {
+    @apply rounded-sm px-1 text-gray-950;
+    background: #facc15;
+  }
+  .sermon-editor-content {
+    @apply min-h-48 px-4 py-3 text-sm leading-7 text-gray-100 outline-none;
+  }
+  .sermon-editor-content p {
+    @apply my-2;
+  }
+  .sermon-editor-content h2 {
+    @apply my-3 text-xl font-semibold;
+  }
+  .sermon-editor-content ul {
+    @apply my-3 list-disc pl-6;
+  }
+  .sermon-editor-content ol {
+    @apply my-3 list-decimal pl-6;
+  }
+  .sermon-editor-content blockquote {
+    @apply my-3 border-l-2 border-indigo-400 pl-4 text-gray-300;
+  }
+  .sermon-content-tabs,
+  .sermon-point-tablist {
+    @apply flex flex-wrap gap-2;
+  }
+  .sermon-content-tab,
+  .sermon-point-tab {
+    @apply rounded-md border border-gray-700 px-3 py-2 text-sm text-gray-300
+      hover:border-indigo-500 hover:text-white;
+  }
+  .sermon-content-tab-active,
+  .sermon-point-tab-active {
+    @apply border-indigo-500 bg-indigo-500/15 text-indigo-200;
+  }
   .admin-label {
     @apply block text-sm font-medium text-gray-300 mb-1.5;
   }

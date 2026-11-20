@@ -61,6 +61,7 @@ export async function aiUploadFile(
   if (church) form.append('church', church);
   const { data } = await axiosInstance.post<AIUploadResponse>('/uploads/ai-upload', form, {
     headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 0,
     onUploadProgress: (e) => {
       if (onProgress && e.total) onProgress(Math.round((e.loaded / e.total) * 100));
     },
